@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grêmio App - Comunidade Escolar</title>
+    <meta name="description" content="Aplicativo oficial do Grêmio Estudantil. Fique por dentro de notícias, eventos e comunicados importantes da escola.">
+    <meta name="keywords" content="grêmio, estudantil, escola, alunos, notícias, eventos, agenda, comunicados">
+    <meta name="author" content="Pedro Henrique Martins">
+    <meta name="robots" content="index, follow">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gremio-app-45607.web.app/">
+    <meta property="og:title" content="Grêmio App - Comunidade Escolar">
+    <meta property="og:description" content="Aplicativo oficial do Grêmio Estudantil. Fique por dentro de notícias, eventos e comunicados importantes da escola.">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630.png?text=Grêmio+App">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://gremio-app-45607.web.app/">
+    <meta property="twitter:title" content="Grêmio App - Comunidade Escolar">
+    <meta property="twitter:description" content="Aplicativo oficial do Grêmio Estudantil. Fique por dentro de notícias, eventos e comunicados importantes da escola.">
+    <meta property="twitter:image" content="https://via.placeholder.com/1200x630.png?text=Grêmio+App">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://via.placeholder.com/32?text=GA">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/180?text=GA">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== RESET E VARIÁVEIS ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f0f4fa;
+            height: 100vh;
+            overflow: hidden;
+            color: #1e293b;
+        }
+
+        /* ===== TELA DE LOGIN ===== */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(145deg, #0b2b5c 0%, #1a4b8c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+            backdrop-filter: blur(8px);
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            padding: 40px 32px;
+            border-radius: 40px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 30px 50px rgba(0, 20, 40, 0.4);
+            border: 1px solid rgba(255,255,255,0.5);
+            animation: float 6s infinite alternate;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-8px); }
+        }
+        .login-card h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0a2e5e, #1e4a7a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .login-card p {
+            color: #2c3e50;
+            margin-bottom: 32px;
+            opacity: 0.8;
+        }
+        .btn-google {
+            background: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 60px;
+            width: 100%;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        .btn-google:hover {
+            transform: scale(1.02);
+            background: #f8fafc;
+            box-shadow: 0 12px 28px rgba(0, 82, 155, 0.3);
+        }
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* ===== APP PRINCIPAL ===== */
+        #app-screen {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            background: #f0f4fa;
+        }
+
+        /* HEADER */
+        header {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.6);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .user-info img {
+            width: 48px;
+            height: 48px;
+            border-radius: 28px;
+            border: 2px solid white;
+            object-fit: cover;
+            box-shadow: 0 6px 12px rgba(0, 40, 80, 0.15);
+        }
+        .user-text h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0b2b5c;
+        }
+        .user-text span {
+            font-size: 0.85rem;
+            color: #4a5a72;
+            display: block;
+            margin-top: 2px;
+        }
+        .btn-icon {
+            background: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #0b2b5c;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+        .btn-icon:hover {
+            background: #eef2f6;
+            transform: scale(1.05);
+        }
+        .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e53e3e;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid white;
+        }
+
+        /* CONTEÚDO */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 20px 160px;
+        }
+        .tab-content {
+            display: none;
+            animation: slideUp 0.4s ease;
+        }
+        .tab-content.active { display: block; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS */
+        .card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 32px;
+            padding: 24px;
+            margin-bottom: 18px;
+            box-shadow: 0 10px 30px -10px rgba(0,30,60,0.1);
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        .card h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #0b2b5c;
+        }
+        .btn-acao {
+            background: #0b2b5c;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 8px 18px rgba(10, 40, 90, 0.25);
+            width: fit-content;
+        }
+        .btn-acao:hover {
+            background: #133e72;
+            transform: translateY(-3px);
+        }
+
+        /* ITENS DE LISTA - AJUSTE PARA EVITAR SOBREPOSIÇÃO DOS ÍCONES */
+        .notificacao-item, .evento-item, .membro-item {
+            background: white;
+            border-radius: 24px;
+            padding: 18px 60px 18px 18px;
+            margin-bottom: 12px;
+            border-left: 6px solid #0b2b5c;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.03);
+            position: relative;
+            word-wrap: break-word;
+        }
+        .evento-item { border-left-color: #e67e22; }
+        .membro-item { border-left-color: #8e44ad; }
+        .notificacao-item h4, .evento-item h4, .membro-item h4 { font-weight: 700; font-size: 1.2rem; margin-bottom: 6px; }
+        .notificacao-item p, .evento-item p, .membro-item p { margin-bottom: 8px; }
+        .notificacao-item small, .evento-item small, .membro-item small { color: #64748b; display: block; }
+        .item-actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 12px;
+        }
+        .item-actions i {
+            font-size: 1.2rem;
+            color: #64748b;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .item-actions i:hover {
+            color: #0b2b5c;
+            transform: scale(1.1);
+        }
+        .item-actions i.fa-check-circle { color: #27ae60; }
+        .item-actions i.fa-check-circle:hover { color: #2ecc71; }
+        .item-actions i.fa-pen-to-square:hover { color: #f39c12; }
+        .item-actions i.fa-trash-can:hover { color: #e74c3c; }
+
+        /* Ajuste fino para telas pequenas */
+        @media (max-width: 480px) {
+            .notificacao-item, .evento-item, .membro-item {
+                padding: 15px 50px 15px 15px;
+            }
+            .item-actions {
+                top: 12px;
+                right: 12px;
+            }
+            .item-actions i {
+                font-size: 1rem;
+            }
+        }
+
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            display: flex;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 60px;
+            box-shadow: 0 15px 35px rgba(0,20,40,0.15);
+            border: 1px solid rgba(255,255,255,0.7);
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6f7d95;
+            cursor: pointer;
+            padding: 10px 18px;
+            border-radius: 40px;
+            transition: 0.2s;
+        }
+        .nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
+        .nav-item.active {
+            background: #0b2b5c;
+            color: white;
+            box-shadow: 0 6px 14px rgba(0,82,155,0.4);
+        }
+
+        /* MODAIS */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 20, 30, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-card {
+            background: white;
+            border-radius: 48px;
+            width: 100%;
+            max-width: 460px;
+            padding: 32px;
+            box-shadow: 0 40px 70px rgba(0, 20, 40, 0.4);
+            animation: modalPop 0.4s ease;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .modal-card h2 {
+            color: #0b2b5c;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .modal-card input, .modal-card textarea, .modal-card input[type="date"], .modal-card select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid #dde3ea;
+            border-radius: 30px;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            background: #f9fcff;
+            transition: 0.2s;
+        }
+        .modal-card input:focus, .modal-card textarea:focus, .modal-card select:focus {
+            outline: none;
+            border-color: #0b2b5c;
+            box-shadow: 0 0 0 4px rgba(11,43,92,0.1);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #eef2f6;
+            transition: 0.2s;
+        }
+        .modal-btn.primary {
+            background: #0b2b5c;
+            color: white;
+            box-shadow: 0 8px 18px rgba(0,82,155,0.3);
+        }
+        .modal-btn.primary:hover { background: #133e72; }
+        .close-icon {
+            float: right;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        /* Estilo para os radios de tipo de data */
+        .tipo-data-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+        .tipo-data-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1rem;
+            color: #1e293b;
+            cursor: pointer;
+        }
+        .tipo-data-group input[type="radio"] {
+            width: auto;
+            margin-bottom: 0;
+        }
+
+        /* ===== RODAPÉ PROFISSIONAL ===== */
+        .app-footer {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(5px);
+            border-radius: 40px;
+            color: #1e293b;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            letter-spacing: 0.3px;
+        }
+        .app-footer span {
+            background: rgba(11, 43, 92, 0.1);
+            padding: 6px 14px;
+            border-radius: 50px;
+            display: inline-block;
+        }
+        .app-footer i {
+            color: #e53e3e;
+            margin: 0 4px;
+        }
+
+        /* Badge de cargo */
+        .cargo-badge {
+            background: #8e44ad;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="login-screen">
+    <div class="login-card">
+        <h1>Grêmio App</h1>
+        <p>conecte‑se com sua conta</p>
+        <button id="btn-login" class="btn-google">
+            <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Google
+        </button>
+    </div>
+</div>
+
+<!-- APLICATIVO PRINCIPAL -->
+<div id="app-screen">
+    <header>
+        <div class="user-info">
+            <img id="user-foto" src="https://via.placeholder.com/48" alt="foto">
+            <div class="user-text">
+                <h2>Grêmio App</h2>
+                <span id="user-nome">Carregando...</span>
+            </div>
+        </div>
+        <div class="btn-icon" id="btn-sino">
+            <i class="fa-solid fa-bell"></i>
+            <span class="badge" id="notif-badge" style="display: none;">0</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- ABA INÍCIO -->
+        <div id="inicio" class="tab-content active">
+            <div class="card">
+                <h3><i class="fa-solid fa-house" style="margin-right: 10px;"></i> Início</h3>
+                <p style="margin-bottom: 16px;">Bem‑vindo de volta! Fique por dentro de tudo.</p>
+                <div style="background: #d9e9ff; border-radius: 24px; padding: 20px;">
+                    <strong>Comunicado:</strong> A nova gestão já está atuando. Fique ligado!
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA AGENDA -->
+        <div id="agenda" class="tab-content">
+            <div class="card">
+                <h3><i class="fa-solid fa-calendar-days" style="margin-right: 10px;"></i> Agenda</h3>
+                <div id="eventos-lista">
+                    <p style="color: #5f6b7a;">Carregando eventos...</p>
+                </div>
+                <button id="btn-novo-evento" class="btn-acao" style="margin-top: 16px; display: none;">
+                    <i class="fa-regular fa-plus"></i>  Novo evento
+                </button>
+            </div>
+        </div>
+
+        <!-- ABA GESTÃO (NOVA) -->
+        <div id="gestao" class="tab-content">
+            <div class="card">
+                <h3><i class="fa-solid fa-shield-halved" style="margin-right: 10px;"></i> Nossa Gestão</h3>
+                <p>Conheça os membros do Grêmio Estudantil.</p>
+                <button id="btn-registrar-cargo" class="btn-acao" style="margin-top: 16px; display: none;">
+                    <i class="fa-regular fa-plus"></i>  Registrar cargo
+                </button>
+            </div>
+            <div id="membros-lista">
+                <p style="color: #5f6b7a;">Carregando membros da gestão...</p>
+            </div>
+        </div>
+
+        <!-- ABA ADMIN -->
+        <div id="admin" class="tab-content">
+            <div class="card">
+                <h3><i class="fa-solid fa-gear" style="margin-right: 10px;"></i> Administração</h3>
+                <p>Gerencie notificações e eventos.</p>
+                <button id="btn-nova-notificacao" class="btn-acao" style="margin-top: 16px;">
+                    <i class="fa-regular fa-plus"></i> Nova notificação
+                </button>
+            </div>
+            <div id="admin-notificacoes-lista">
+                <p style="color: #5f6b7a;">Carregando notificações...</p>
+            </div>
+        </div>
+
+        <!-- RODAPÉ PROFISSIONAL -->
+        <footer class="app-footer">
+            <span>Desenvolvido com 𓆩❤︎𓆪 por Pedro Henrique Martins – 1º M.</span>
+        </footer>
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" id="nav-inicio"><i class="fa-solid fa-house"></i></div>
+        <div class="nav-item" id="nav-agenda"><i class="fa-solid fa-calendar-days"></i></div>
+        <div class="nav-item" id="nav-gestao"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="nav-item" id="nav-plus" style="display: none;"><i class="fa-solid fa-plus"></i></div>
+    </nav>
+</div>
+
+<!-- MODAL NOTIFICAÇÕES -->
+<div id="modal-notificacoes" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-icon" id="close-notif-modal">&times;</span>
+        <h2><i class="fa-solid fa-bell" style="margin-right: 10px;"></i> Notificações</h2>
+        <div id="notificacoes-lista" style="max-height: 400px; overflow-y: auto;">Carregando...</div>
+    </div>
+</div>
+
+<!-- MODAL CONFIRMAÇÃO -->
+<div id="modal-confirmacao" class="modal-overlay">
+    <div class="modal-card" style="text-align: center;">
+        <i class="fa-regular fa-circle-check" style="font-size: 4rem; color: #0b2b5c;"></i>
+        <h3 id="modal-titulo" style="margin: 10px 0;">Título</h3>
+        <p id="modal-mensagem" style="margin-bottom: 24px;">Mensagem</p>
+        <button class="modal-btn primary" id="fechar-confirmacao">OK</button>
+    </div>
+</div>
+
+<!-- MODAL CONFIRMAÇÃO EXCLUIR -->
+<div id="modal-confirmar-excluir" class="modal-overlay">
+    <div class="modal-card" style="text-align: center;">
+        <i class="fa-regular fa-circle-question" style="font-size: 4rem; color: #e67e22;"></i>
+        <h3 style="margin: 10px 0;">Confirmar exclusão</h3>
+        <p id="excluir-mensagem" style="margin-bottom: 24px;">Tem certeza que deseja excluir este item?</p>
+        <div class="modal-actions">
+            <button class="modal-btn" id="cancelar-excluir">Cancelar</button>
+            <button class="modal-btn primary" id="confirmar-excluir">Excluir</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CRIAR NOTIFICAÇÃO -->
+<div id="modal-criar-notificacao" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-icon" id="close-criar-modal">&times;</span>
+        <h2><i class="fa-regular fa-square-plus" style="margin-right: 10px;"></i> Nova Notificação</h2>
+        <input type="text" id="notif-titulo" placeholder="Título" maxlength="100">
+        <textarea id="notif-corpo" rows="4" placeholder="Escreva a mensagem..."></textarea>
+        <div class="modal-actions">
+            <button class="modal-btn" id="cancelar-criar">Cancelar</button>
+            <button class="modal-btn primary" id="salvar-notificacao">Publicar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CRIAR EVENTO -->
+<div id="modal-criar-evento" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-icon" id="close-evento-modal">&times;</span>
+        <h2><i class="fa-regular fa-calendar-plus" style="margin-right: 10px;"></i> Novo Evento</h2>
+        <input type="text" id="evento-titulo" placeholder="Título do evento" maxlength="100">
+        <textarea id="evento-descricao" rows="3" placeholder="Descrição..."></textarea>
+        
+        <div class="tipo-data-group">
+            <label>
+                <input type="radio" name="tipoData" value="especifica" checked> Data específica
+            </label>
+            <label>
+                <input type="radio" name="tipoData" value="semanal"> Dia da semana
+            </label>
+        </div>
+
+        <div id="campo-data-especifica">
+            <input type="date" id="evento-data">
+        </div>
+
+        <div id="campo-dia-semana" style="display: none;">
+            <select id="evento-dia-semana">
+                <option value="segunda">Segunda-feira</option>
+                <option value="terça">Terça-feira</option>
+                <option value="quarta">Quarta-feira</option>
+                <option value="quinta">Quinta-feira</option>
+                <option value="sexta">Sexta-feira</option>
+                <option value="sábado">Sábado</option>
+                <option value="domingo">Domingo</option>
+            </select>
+        </div>
+
+        <div class="modal-actions">
+            <button class="modal-btn" id="cancelar-evento">Cancelar</button>
+            <button class="modal-btn primary" id="salvar-evento">Criar Evento</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR NOTIFICAÇÃO -->
+<div id="modal-editar-notificacao" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-icon" id="close-editar-notif-modal">&times;</span>
+        <h2><i class="fa-regular fa-pen-to-square" style="margin-right: 10px;"></i> Editar Notificação</h2>
+        <input type="hidden" id="editar-notif-id">
+        <input type="text" id="editar-notif-titulo" placeholder="Título" maxlength="100">
+        <textarea id="editar-notif-corpo" rows="4" placeholder="Escreva a mensagem..."></textarea>
+        <div class="modal-actions">
+            <button class="modal-btn" id="cancelar-editar-notif">Cancelar</button>
+            <button class="modal-btn primary" id="salvar-editar-notif">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR EVENTO -->
+<div id="modal-editar-evento" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-icon" id="close-editar-evento-modal">&times;</span>
+        <h2><i class="fa-regular fa-pen-to-square" style="margin-right: 10px;"></i> Editar Evento</h2>
+        <input type="hidden" id="editar-evento-id">
+        <input type="text" id="editar-evento-titulo" placeholder="Título do evento" maxlength="100">
+        <textarea id="editar-evento-descricao" rows="3" placeholder="Descrição..."></textarea>
+        
+        <div class="tipo-data-group">
+            <label>
+                <input type="radio" name="editarTipoData" value="especifica"> Data específica
+            </label>
+            <label>
+                <input type="radio" name="editarTipoData" value="semanal"> Dia da semana
+            </label>
+        </div>
+
+        <div id="editar-campo-data-especifica">
+            <input type="date" id="editar-evento-data">
+        </div>
+
+        <div id="editar-campo-dia-semana" style="display: none;">
+            <select id="editar-evento-dia-semana">
+                <option value="segunda">Segunda-feira</option>
+                <option value="terça">Terça-feira</option>
+                <option value="quarta">Quarta-feira</option>
+                <option value="quinta">Quinta-feira</option>
+                <option value="sexta">Sexta-feira</option>
+                <option value="sábado">Sábado</option>
+                <option value="domingo">Domingo</option>
+            </select>
+        </div>
+
+        <div class="modal-actions">
+            <button class="modal-btn" id="cancelar-editar-evento">Cancelar</button>
+            <button class="modal-btn primary" id="salvar-editar-evento">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL REGISTRAR CARGO -->
+<div id="modal-registrar-cargo" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-icon" id="close-cargo-modal">&times;</span>
+        <h2><i class="fa-solid fa-shield-halved" style="margin-right: 10px;"></i> Registrar Cargo</h2>
+        <input type="text" id="cargo-nome" placeholder="Nome completo" maxlength="100">
+        <select id="cargo-turno">
+            <option value="">Selecione o turno</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Vespertino">Vespertino</option>
+            <option value="Noturno">Noturno</option>
+            <option value="Integral">Integral</option>
+        </select>
+        <input type="text" id="cargo-serie" placeholder="Série (ex: 1º Médio)" maxlength="50">
+        <input type="text" id="cargo-descricao" placeholder="Descrição do cargo (ex: Presidente)" maxlength="100">
+        <div class="modal-actions">
+            <button class="modal-btn" id="cancelar-cargo">Cancelar</button>
+            <button class="modal-btn primary" id="salvar-cargo">Registrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR CARGO -->
+<div id="modal-editar-cargo" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-icon" id="close-editar-cargo-modal">&times;</span>
+        <h2><i class="fa-regular fa-pen-to-square" style="margin-right: 10px;"></i> Editar Cargo</h2>
+        <input type="hidden" id="editar-cargo-id">
+        <input type="text" id="editar-cargo-nome" placeholder="Nome completo" maxlength="100">
+        <select id="editar-cargo-turno">
+            <option value="">Selecione o turno</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Vespertino">Vespertino</option>
+            <option value="Noturno">Noturno</option>
+            <option value="Integral">Integral</option>
+        </select>
+        <input type="text" id="editar-cargo-serie" placeholder="Série (ex: 1º Médio)" maxlength="50">
+        <input type="text" id="editar-cargo-descricao" placeholder="Descrição do cargo (ex: Presidente)" maxlength="100">
+        <div class="modal-actions">
+            <button class="modal-btn" id="cancelar-editar-cargo">Cancelar</button>
+            <button class="modal-btn primary" id="salvar-editar-cargo">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // Configuração do Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyCImbkUwcVnZUK6gpUXLnLRbdy5Yqt5At0",
+        authDomain: "gremio-app-45607.firebaseapp.com",
+        projectId: "gremio-app-45607",
+        storageBucket: "gremio-app-45607.firebasestorage.app",
+        messagingSenderId: "1039375675208",
+        appId: "1:1039375675208:web:cac4a175f4e6dd1c8a4d7d"
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // E-mails admin
+    const ADMIN_EMAILS = ["pintoteamopai1234@gmail.com", "outroadmin@gmail.com", "tais.cunico@edu.mt.gov.br", "stephanieluanagonchoroski@gmail.com", "mariaeduardacardososorriso25@gmail.com", "novodovosk.sabrina@gmail.com"];
+
+    // Elementos DOM
+    const loginScreen = document.getElementById('login-screen');
+    const appScreen = document.getElementById('app-screen');
+    const userFoto = document.getElementById('user-foto');
+    const userNome = document.getElementById('user-nome');
+    const btnLogin = document.getElementById('btn-login');
+    const navPlus = document.getElementById('nav-plus');
+    const notifBadge = document.getElementById('notif-badge');
+    const btnNovoEvento = document.getElementById('btn-novo-evento');
+
+    // Modais
+    const modalNotif = document.getElementById('modal-notificacoes');
+    const modalConfirm = document.getElementById('modal-confirmacao');
+    const modalCriarNotif = document.getElementById('modal-criar-notificacao');
+    const modalCriarEvento = document.getElementById('modal-criar-evento');
+    const modalEditarNotif = document.getElementById('modal-editar-notificacao');
+    const modalEditarEvento = document.getElementById('modal-editar-evento');
+    const modalConfirmarExcluir = document.getElementById('modal-confirmar-excluir');
+    const modalRegistrarCargo = document.getElementById('modal-registrar-cargo');
+    const modalEditarCargo = document.getElementById('modal-editar-cargo');
+
+    // Botões fechar
+    const closeNotif = document.getElementById('close-notif-modal');
+    const closeCriarNotif = document.getElementById('close-criar-modal');
+    const cancelarCriarNotif = document.getElementById('cancelar-criar');
+    const closeEvento = document.getElementById('close-evento-modal');
+    const cancelarEvento = document.getElementById('cancelar-evento');
+    const fecharConfirm = document.getElementById('fechar-confirmacao');
+    const closeEditarNotif = document.getElementById('close-editar-notif-modal');
+    const cancelarEditarNotif = document.getElementById('cancelar-editar-notif');
+    const closeEditarEvento = document.getElementById('close-editar-evento-modal');
+    const cancelarEditarEvento = document.getElementById('cancelar-editar-evento');
+    const cancelarExcluir = document.getElementById('cancelar-excluir');
+    const confirmarExcluir = document.getElementById('confirmar-excluir');
+    const closeCargo = document.getElementById('close-cargo-modal');
+    const cancelarCargo = document.getElementById('cancelar-cargo');
+    const closeEditarCargo = document.getElementById('close-editar-cargo-modal');
+    const cancelarEditarCargo = document.getElementById('cancelar-editar-cargo');
+
+    // Variável para controle de exclusão
+    let itemParaExcluir = { tipo: null, id: null };
+
+    // Funções auxiliares
+    function showModal(modal) { modal.classList.add('active'); }
+    function hideModal(modal) { modal.classList.remove('active'); }
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) hideModal(overlay);
+        });
+    });
+
+    closeNotif.addEventListener('click', () => hideModal(modalNotif));
+    closeCriarNotif.addEventListener('click', () => hideModal(modalCriarNotif));
+    cancelarCriarNotif.addEventListener('click', () => hideModal(modalCriarNotif));
+    closeEvento.addEventListener('click', () => hideModal(modalCriarEvento));
+    cancelarEvento.addEventListener('click', () => hideModal(modalCriarEvento));
+    fecharConfirm.addEventListener('click', () => hideModal(modalConfirm));
+    closeEditarNotif.addEventListener('click', () => hideModal(modalEditarNotif));
+    cancelarEditarNotif.addEventListener('click', () => hideModal(modalEditarNotif));
+    closeEditarEvento.addEventListener('click', () => hideModal(modalEditarEvento));
+    cancelarEditarEvento.addEventListener('click', () => hideModal(modalEditarEvento));
+    cancelarExcluir.addEventListener('click', () => hideModal(modalConfirmarExcluir));
+    closeCargo.addEventListener('click', () => hideModal(modalRegistrarCargo));
+    cancelarCargo.addEventListener('click', () => hideModal(modalRegistrarCargo));
+    closeEditarCargo.addEventListener('click', () => hideModal(modalEditarCargo));
+    cancelarEditarCargo.addEventListener('click', () => hideModal(modalEditarCargo));
+
+    function mostrarConfirmacao(titulo, mensagem) {
+        document.getElementById('modal-titulo').innerText = titulo;
+        document.getElementById('modal-mensagem').innerText = mensagem;
+        showModal(modalConfirm);
+    }
+
+    // Lógica para alternar entre data específica e dia da semana (criar)
+    const radiosTipoData = document.querySelectorAll('input[name="tipoData"]');
+    const campoDataEspecifica = document.getElementById('campo-data-especifica');
+    const campoDiaSemana = document.getElementById('campo-dia-semana');
+
+    radiosTipoData.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'especifica') {
+                campoDataEspecifica.style.display = 'block';
+                campoDiaSemana.style.display = 'none';
+            } else {
+                campoDataEspecifica.style.display = 'none';
+                campoDiaSemana.style.display = 'block';
+            }
+        });
+    });
+
+    // Lógica para alternar entre data específica e dia da semana (editar)
+    const editarRadiosTipoData = document.querySelectorAll('input[name="editarTipoData"]');
+    const editarCampoDataEspecifica = document.getElementById('editar-campo-data-especifica');
+    const editarCampoDiaSemana = document.getElementById('editar-campo-dia-semana');
+
+    editarRadiosTipoData.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'especifica') {
+                editarCampoDataEspecifica.style.display = 'block';
+                editarCampoDiaSemana.style.display = 'none';
+            } else {
+                editarCampoDataEspecifica.style.display = 'none';
+                editarCampoDiaSemana.style.display = 'block';
+            }
+        });
+    });
+
+    // Login
+    btnLogin.addEventListener('click', async () => {
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            console.error(error);
+            mostrarConfirmacao("Erro no login", "Não foi possível entrar com Google.");
+        }
+    });
+
+    function isAdmin(user) {
+        return user && ADMIN_EMAILS.includes(user.email);
+    }
+
+    // Monitorar autenticação
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            loginScreen.style.opacity = '0';
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                appScreen.style.display = 'flex';
+                setTimeout(() => appScreen.style.opacity = '1', 50);
+            }, 300);
+
+            userFoto.src = user.photoURL || 'https://via.placeholder.com/48';
+            userNome.innerText = user.displayName || 'Usuário';
+
+            const admin = isAdmin(user);
+            if (admin) {
+                navPlus.style.display = 'flex';
+                btnNovoEvento.style.display = 'inline-flex';
+                document.getElementById('btn-registrar-cargo').style.display = 'inline-flex';
+            } else {
+                navPlus.style.display = 'none';
+                btnNovoEvento.style.display = 'none';
+                document.getElementById('btn-registrar-cargo').style.display = 'none';
+            }
+
+            // Inicia snapshot das notificações para o badge
+            carregarBadgeNotificacoes(user.uid);
+            // Inicia snapshot dos eventos (tempo real)
+            carregarEventosTempoReal();
+            // Inicia snapshot dos membros da gestão
+            carregarMembrosTempoReal();
+
+            if (document.getElementById('admin').classList.contains('active') && admin) {
+                carregarNotificacoesAdmin();
+            }
+        } else {
+            loginScreen.style.display = 'flex';
+            loginScreen.style.opacity = '1';
+            appScreen.style.display = 'none';
+        }
+    });
+
+    // Badge de notificações não lidas
+    function carregarBadgeNotificacoes(uid) {
+        const q = query(collection(db, "notificacoes"), orderBy("data", "desc"));
+        onSnapshot(q, (snapshot) => {
+            let naoLidas = 0;
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (!data.lidoPor || !data.lidoPor.includes(uid)) {
+                    naoLidas++;
+                }
+            });
+            if (naoLidas > 0) {
+                notifBadge.style.display = 'flex';
+                notifBadge.innerText = naoLidas;
+            } else {
+                notifBadge.style.display = 'none';
+            }
+        });
+    }
+
+    // CARREGAR EVENTOS EM TEMPO REAL
+    function carregarEventosTempoReal() {
+        const container = document.getElementById('eventos-lista');
+        const q = query(collection(db, "eventos"), orderBy("createdAt", "desc"));
+
+        onSnapshot(q, (snapshot) => {
+            if (snapshot.empty) {
+                container.innerHTML = '<p style="color:#94a3b8;">Nenhum evento agendado.</p>';
+                return;
+            }
+
+            let html = '';
+            snapshot.forEach(doc => {
+                const ev = doc.data();
+                const admin = isAdmin(auth.currentUser);
+
+                let dataStr = '';
+                if (ev.dataTipo === 'semanal' && ev.diaSemana) {
+                    const dias = {
+                        'segunda': 'Segunda-feira',
+                        'terça': 'Terça-feira',
+                        'quarta': 'Quarta-feira',
+                        'quinta': 'Quinta-feira',
+                        'sexta': 'Sexta-feira',
+                        'sábado': 'Sábado',
+                        'domingo': 'Domingo'
+                    };
+                    dataStr = `Todo(a) ${dias[ev.diaSemana] || ev.diaSemana}`;
+                } else if (ev.data) {
+                    const dataObj = ev.data?.toDate ? ev.data.toDate() : new Date(ev.data);
+                    dataStr = dataObj.toLocaleDateString();
+                } else {
+                    dataStr = 'Data não definida';
+                }
+
+                html += `
+                    <div class="evento-item" data-id="${doc.id}">
+                        <h4>${ev.titulo || 'Sem título'}</h4>
+                        <p>${ev.descricao || ''}</p>
+                        <small><i class="fa-regular fa-calendar"></i> ${dataStr}</small>
+                        ${admin ? `
+                        <div class="item-actions">
+                            <i class="fa-regular fa-pen-to-square" onclick="editarEvento('${doc.id}')"></i>
+                            <i class="fa-regular fa-trash-can" onclick="excluirEvento('${doc.id}')"></i>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }, (error) => {
+            console.error("Erro no snapshot de eventos:", error);
+            container.innerHTML = '<p>Erro ao carregar eventos em tempo real.</p>';
+        });
+    }
+
+    // CARREGAR MEMBROS DA GESTÃO EM TEMPO REAL
+    function carregarMembrosTempoReal() {
+        const container = document.getElementById('membros-lista');
+        const q = query(collection(db, "membros"), orderBy("nome", "asc"));
+
+        onSnapshot(q, (snapshot) => {
+            if (snapshot.empty) {
+                container.innerHTML = '<p style="color:#94a3b8;">Nenhum membro cadastrado na gestão.</p>';
+                return;
+            }
+
+            let html = '';
+            snapshot.forEach(doc => {
+                const membro = doc.data();
+                const admin = isAdmin(auth.currentUser);
+
+                html += `
+                    <div class="membro-item" data-id="${doc.id}">
+                        <h4>${membro.nome || 'Nome não informado'}</h4>
+                        <p><i class="fa-regular fa-clock"></i> Turno: ${membro.turno || 'Não informado'}</p>
+                        <p><i class="fa-regular fa-book"></i> Série: ${membro.serie || 'Não informado'}</p>
+                        <div class="cargo-badge"><i class="fa-solid fa-shield-halved"></i> ${membro.descricao || 'Membro'}</div>
+                        ${admin ? `
+                        <div class="item-actions">
+                            <i class="fa-regular fa-pen-to-square" onclick="editarMembro('${doc.id}')"></i>
+                            <i class="fa-regular fa-trash-can" onclick="excluirMembro('${doc.id}')"></i>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }, (error) => {
+            console.error("Erro no snapshot de membros:", error);
+            container.innerHTML = '<p>Erro ao carregar membros da gestão.</p>';
+        });
+    }
+
+    // Carregar notificações no modal do sino
+    async function carregarNotificacoesModal() {
+        const listaDiv = document.getElementById('notificacoes-lista');
+        try {
+            const q = query(collection(db, "notificacoes"), orderBy("data", "desc"));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+                listaDiv.innerHTML = '<p style="color:#94a3b8;">Nenhuma notificação.</p>';
+            } else {
+                let html = '';
+                const uid = auth.currentUser?.uid;
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const dataStr = data.data?.toDate ? new Date(data.data.toDate()).toLocaleString() : '';
+                    const lida = data.lidoPor && data.lidoPor.includes(uid);
+                    html += `
+                        <div class="notificacao-item" data-id="${doc.id}">
+                            <h4>${data.titulo || 'Sem título'}</h4>
+                            <p>${data.corpo || ''}</p>
+                            <small>${dataStr}</small>
+                            <div class="item-actions">
+                                ${!lida ? `<i class="fa-regular fa-check-circle" onclick="marcarComoLida('${doc.id}')" title="Marcar como lida"></i>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                listaDiv.innerHTML = html;
+            }
+            showModal(modalNotif);
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Não foi possível carregar as notificações.");
+        }
+    }
+
+    // Marcar notificação como lida
+    window.marcarComoLida = async (id) => {
+        const uid = auth.currentUser?.uid;
+        if (!uid) return;
+        try {
+            const notifRef = doc(db, "notificacoes", id);
+            await updateDoc(notifRef, {
+                lidoPor: arrayUnion(uid)
+            });
+            carregarNotificacoesModal();
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Não foi possível marcar como lida.");
+        }
+    };
+
+    // Abrir modal de notificações
+    document.getElementById('btn-sino').addEventListener('click', carregarNotificacoesModal);
+
+    // Criar notificação
+    document.getElementById('btn-nova-notificacao')?.addEventListener('click', () => {
+        showModal(modalCriarNotif);
+    });
+
+    document.getElementById('salvar-notificacao').addEventListener('click', async () => {
+        const titulo = document.getElementById('notif-titulo').value.trim();
+        const corpo = document.getElementById('notif-corpo').value.trim();
+        if (!titulo || !corpo) {
+            mostrarConfirmacao("Campos vazios", "Preencha título e mensagem.");
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "notificacoes"), {
+                titulo,
+                corpo,
+                data: new Date(),
+                criadoPor: auth.currentUser?.email || 'admin',
+                lidoPor: []
+            });
+            mostrarConfirmacao("Sucesso", "Notificação publicada!");
+            hideModal(modalCriarNotif);
+            document.getElementById('notif-titulo').value = '';
+            document.getElementById('notif-corpo').value = '';
+
+            if (document.getElementById('admin').classList.contains('active')) {
+                carregarNotificacoesAdmin();
+            }
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao salvar no Firestore.");
+        }
+    });
+
+    // Criar evento
+    btnNovoEvento.addEventListener('click', () => {
+        document.getElementById('evento-titulo').value = '';
+        document.getElementById('evento-descricao').value = '';
+        document.getElementById('evento-data').value = '';
+        document.querySelector('input[name="tipoData"][value="especifica"]').checked = true;
+        campoDataEspecifica.style.display = 'block';
+        campoDiaSemana.style.display = 'none';
+        showModal(modalCriarEvento);
+    });
+
+    document.getElementById('salvar-evento').addEventListener('click', async () => {
+        const titulo = document.getElementById('evento-titulo').value.trim();
+        const descricao = document.getElementById('evento-descricao').value.trim();
+        const tipoData = document.querySelector('input[name="tipoData"]:checked').value;
+
+        if (!titulo || !descricao) {
+            mostrarConfirmacao("Campos vazios", "Preencha título e descrição.");
+            return;
+        }
+
+        let eventoData = {
+            titulo,
+            descricao,
+            criadoPor: auth.currentUser?.email || 'admin',
+            dataTipo: tipoData,
+            createdAt: new Date()
+        };
+
+        if (tipoData === 'especifica') {
+            const dataStr = document.getElementById('evento-data').value;
+            if (!dataStr) {
+                mostrarConfirmacao("Data vazia", "Selecione uma data.");
+                return;
+            }
+            eventoData.data = new Date(dataStr + 'T12:00:00');
+        } else {
+            const diaSemana = document.getElementById('evento-dia-semana').value;
+            eventoData.diaSemana = diaSemana;
+        }
+
+        try {
+            await addDoc(collection(db, "eventos"), eventoData);
+            mostrarConfirmacao("Sucesso", "Evento criado!");
+            hideModal(modalCriarEvento);
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao salvar evento: " + e.message);
+        }
+    });
+
+    // Registrar cargo
+    document.getElementById('btn-registrar-cargo').addEventListener('click', () => {
+        document.getElementById('cargo-nome').value = '';
+        document.getElementById('cargo-turno').value = '';
+        document.getElementById('cargo-serie').value = '';
+        document.getElementById('cargo-descricao').value = '';
+        showModal(modalRegistrarCargo);
+    });
+
+    document.getElementById('salvar-cargo').addEventListener('click', async () => {
+        const nome = document.getElementById('cargo-nome').value.trim();
+        const turno = document.getElementById('cargo-turno').value;
+        const serie = document.getElementById('cargo-serie').value.trim();
+        const descricao = document.getElementById('cargo-descricao').value.trim();
+
+        if (!nome || !turno || !serie || !descricao) {
+            mostrarConfirmacao("Campos vazios", "Preencha todos os campos.");
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "membros"), {
+                nome,
+                turno,
+                serie,
+                descricao,
+                criadoPor: auth.currentUser?.email || 'admin',
+                createdAt: new Date()
+            });
+            mostrarConfirmacao("Sucesso", "Membro registrado com sucesso!");
+            hideModal(modalRegistrarCargo);
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao registrar membro.");
+        }
+    });
+
+    // Editar membro
+    window.editarMembro = async (id) => {
+        try {
+            const docRef = doc(db, "membros", id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const membro = docSnap.data();
+                document.getElementById('editar-cargo-id').value = id;
+                document.getElementById('editar-cargo-nome').value = membro.nome || '';
+                document.getElementById('editar-cargo-turno').value = membro.turno || '';
+                document.getElementById('editar-cargo-serie').value = membro.serie || '';
+                document.getElementById('editar-cargo-descricao').value = membro.descricao || '';
+                showModal(modalEditarCargo);
+            }
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Não foi possível carregar os dados do membro.");
+        }
+    };
+
+    document.getElementById('salvar-editar-cargo').addEventListener('click', async () => {
+        const id = document.getElementById('editar-cargo-id').value;
+        const nome = document.getElementById('editar-cargo-nome').value.trim();
+        const turno = document.getElementById('editar-cargo-turno').value;
+        const serie = document.getElementById('editar-cargo-serie').value.trim();
+        const descricao = document.getElementById('editar-cargo-descricao').value.trim();
+
+        if (!nome || !turno || !serie || !descricao) {
+            mostrarConfirmacao("Campos vazios", "Preencha todos os campos.");
+            return;
+        }
+
+        try {
+            await updateDoc(doc(db, "membros", id), {
+                nome,
+                turno,
+                serie,
+                descricao
+            });
+            mostrarConfirmacao("Sucesso", "Membro atualizado com sucesso!");
+            hideModal(modalEditarCargo);
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao atualizar membro.");
+        }
+    });
+
+    // Excluir membro
+    window.excluirMembro = (id) => {
+        itemParaExcluir = { tipo: 'membro', id };
+        document.getElementById('excluir-mensagem').innerText = 'Tem certeza que deseja excluir este membro da gestão?';
+        showModal(modalConfirmarExcluir);
+    };
+
+    // Carregar notificações na aba admin
+    async function carregarNotificacoesAdmin() {
+        const container = document.getElementById('admin-notificacoes-lista');
+        try {
+            const q = query(collection(db, "notificacoes"), orderBy("data", "desc"));
+            const snap = await getDocs(q);
+            if (snap.empty) {
+                container.innerHTML = '<p>Nenhuma notificação criada.</p>';
+                return;
+            }
+            let html = '<h4 style="margin-top:24px;">Publicações recentes</h4>';
+            snap.forEach(d => {
+                const data = d.data();
+                const dataStr = data.data?.toDate ? new Date(data.data.toDate()).toLocaleString() : '';
+                html += `
+                    <div style="background:white; border-radius:20px; padding:15px; margin:10px 0; position:relative;">
+                        <strong>${data.titulo}</strong> <br> ${data.corpo} <br><small>${dataStr}</small>
+                        <div class="item-actions">
+                            <i class="fa-regular fa-pen-to-square" onclick="editarNotificacao('${d.id}')"></i>
+                            <i class="fa-regular fa-trash-can" onclick="excluirNotificacao('${d.id}')"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        } catch (e) {
+            container.innerHTML = '<p>Erro ao carregar.</p>';
+        }
+    }
+
+    // Editar notificação
+    window.editarNotificacao = async (id) => {
+        try {
+            const docRef = doc(db, "notificacoes", id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const notif = docSnap.data();
+                document.getElementById('editar-notif-id').value = id;
+                document.getElementById('editar-notif-titulo').value = notif.titulo || '';
+                document.getElementById('editar-notif-corpo').value = notif.corpo || '';
+                showModal(modalEditarNotif);
+            }
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Não foi possível carregar a notificação.");
+        }
+    };
+
+    // Editar evento
+    window.editarEvento = async (id) => {
+        try {
+            const docRef = doc(db, "eventos", id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const evento = docSnap.data();
+                document.getElementById('editar-evento-id').value = id;
+                document.getElementById('editar-evento-titulo').value = evento.titulo || '';
+                document.getElementById('editar-evento-descricao').value = evento.descricao || '';
+
+                if (evento.dataTipo === 'semanal') {
+                    document.querySelector('input[name="editarTipoData"][value="semanal"]').checked = true;
+                    editarCampoDataEspecifica.style.display = 'none';
+                    editarCampoDiaSemana.style.display = 'block';
+                    document.getElementById('editar-evento-dia-semana').value = evento.diaSemana || 'segunda';
+                } else {
+                    document.querySelector('input[name="editarTipoData"][value="especifica"]').checked = true;
+                    editarCampoDataEspecifica.style.display = 'block';
+                    editarCampoDiaSemana.style.display = 'none';
+                    if (evento.data) {
+                        const dataObj = evento.data?.toDate ? evento.data.toDate() : new Date(evento.data);
+                        const dataStr = dataObj.toISOString().split('T')[0];
+                        document.getElementById('editar-evento-data').value = dataStr;
+                    }
+                }
+                showModal(modalEditarEvento);
+            }
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Não foi possível carregar o evento.");
+        }
+    };
+
+    // Salvar edição de notificação
+    document.getElementById('salvar-editar-notif').addEventListener('click', async () => {
+        const id = document.getElementById('editar-notif-id').value;
+        const titulo = document.getElementById('editar-notif-titulo').value.trim();
+        const corpo = document.getElementById('editar-notif-corpo').value.trim();
+        if (!titulo || !corpo) {
+            mostrarConfirmacao("Campos vazios", "Preencha título e mensagem.");
+            return;
+        }
+        try {
+            await updateDoc(doc(db, "notificacoes", id), {
+                titulo,
+                corpo
+            });
+            mostrarConfirmacao("Sucesso", "Notificação atualizada!");
+            hideModal(modalEditarNotif);
+            carregarNotificacoesAdmin();
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao atualizar.");
+        }
+    });
+
+    // Salvar edição de evento
+    document.getElementById('salvar-editar-evento').addEventListener('click', async () => {
+        const id = document.getElementById('editar-evento-id').value;
+        const titulo = document.getElementById('editar-evento-titulo').value.trim();
+        const descricao = document.getElementById('editar-evento-descricao').value.trim();
+        const tipoData = document.querySelector('input[name="editarTipoData"]:checked').value;
+
+        if (!titulo || !descricao) {
+            mostrarConfirmacao("Campos vazios", "Preencha título e descrição.");
+            return;
+        }
+
+        const updateData = {
+            titulo,
+            descricao,
+            dataTipo: tipoData
+        };
+
+        if (tipoData === 'especifica') {
+            const dataStr = document.getElementById('editar-evento-data').value;
+            if (!dataStr) {
+                mostrarConfirmacao("Data vazia", "Selecione uma data.");
+                return;
+            }
+            updateData.data = new Date(dataStr + 'T12:00:00');
+            updateData.diaSemana = null;
+        } else {
+            const diaSemana = document.getElementById('editar-evento-dia-semana').value;
+            updateData.diaSemana = diaSemana;
+            updateData.data = null;
+        }
+
+        try {
+            await updateDoc(doc(db, "eventos", id), updateData);
+            mostrarConfirmacao("Sucesso", "Evento atualizado!");
+            hideModal(modalEditarEvento);
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao atualizar.");
+        }
+    });
+
+    // Excluir notificação
+    window.excluirNotificacao = (id) => {
+        itemParaExcluir = { tipo: 'notificacao', id };
+        document.getElementById('excluir-mensagem').innerText = 'Tem certeza que deseja excluir esta notificação?';
+        showModal(modalConfirmarExcluir);
+    };
+
+    // Excluir evento
+    window.excluirEvento = (id) => {
+        itemParaExcluir = { tipo: 'evento', id };
+        document.getElementById('excluir-mensagem').innerText = 'Tem certeza que deseja excluir este evento?';
+        showModal(modalConfirmarExcluir);
+    };
+
+    confirmarExcluir.addEventListener('click', async () => {
+        if (!itemParaExcluir.id) return;
+        try {
+            let collectionName = '';
+            if (itemParaExcluir.tipo === 'notificacao') collectionName = 'notificacoes';
+            else if (itemParaExcluir.tipo === 'evento') collectionName = 'eventos';
+            else if (itemParaExcluir.tipo === 'membro') collectionName = 'membros';
+            
+            await deleteDoc(doc(db, collectionName, itemParaExcluir.id));
+            mostrarConfirmacao("Sucesso", "Item excluído com sucesso!");
+            hideModal(modalConfirmarExcluir);
+            
+            if (itemParaExcluir.tipo === 'notificacao') {
+                carregarNotificacoesAdmin();
+            }
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao excluir.");
+        }
+    });
+
+    // Navegação entre abas
+    const tabs = {
+        'nav-inicio': 'inicio',
+        'nav-agenda': 'agenda',
+        'nav-gestao': 'gestao',
+        'nav-plus': 'admin'
+    };
+
+    for (let [navId, tabId] of Object.entries(tabs)) {
+        const navEl = document.getElementById(navId);
+        if (navEl) {
+            navEl.addEventListener('click', () => {
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+                navEl.classList.add('active');
+
+                if (tabId === 'admin' && isAdmin(auth.currentUser)) {
+                    carregarNotificacoesAdmin();
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

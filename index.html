@@ -239,19 +239,55 @@
             transform: translateY(-3px);
         }
 
-        /* ITENS DE LISTA - AJUSTE PARA EVITAR SOBREPOSIÇÃO DOS ÍCONES */
+        /* SELETOR DE CORES */
+        .color-picker {
+            margin: 16px 0;
+        }
+        .color-picker label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+        .color-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+        .color-option.selected {
+            border-color: #0b2b5c;
+            transform: scale(1.05);
+        }
+        .color-option input[type="radio"] {
+            display: none;
+        }
+
+        /* ITENS DE LISTA - CORES DINÂMICAS */
         .notificacao-item, .evento-item, .membro-item {
             background: white;
             border-radius: 24px;
             padding: 18px 60px 18px 18px;
             margin-bottom: 12px;
-            border-left: 6px solid #0b2b5c;
             box-shadow: 0 5px 12px rgba(0,0,0,0.03);
             position: relative;
             word-wrap: break-word;
+            border-left-width: 6px;
+            border-left-style: solid;
         }
-        .evento-item { border-left-color: #e67e22; }
-        .membro-item { border-left-color: #8e44ad; }
+        .evento-item { border-left-color: var(--evento-cor, #e67e22); }
+        .membro-item { border-left-color: var(--membro-cor, #8e44ad); }
         .notificacao-item h4, .evento-item h4, .membro-item h4 { font-weight: 700; font-size: 1.2rem; margin-bottom: 6px; }
         .notificacao-item p, .evento-item p, .membro-item p { margin-bottom: 8px; }
         .notificacao-item small, .evento-item small, .membro-item small { color: #64748b; display: block; }
@@ -350,6 +386,8 @@
             padding: 32px;
             box-shadow: 0 40px 70px rgba(0, 20, 40, 0.4);
             animation: modalPop 0.4s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         @keyframes modalPop {
             from { transform: scale(0.9) translateY(20px); opacity: 0; }
@@ -644,24 +682,40 @@
             </select>
         </div>
 
+        <!-- SELETOR DE CORES PARA EVENTO -->
+        <div class="color-picker">
+            <label>Cor da barrinha lateral:</label>
+            <div class="color-options" id="evento-cores">
+                <div class="color-option selected" style="background-color: #e67e22;" data-cor="#e67e22">
+                    <input type="radio" name="eventoCor" value="#e67e22" checked>
+                </div>
+                <div class="color-option" style="background-color: #3498db;" data-cor="#3498db">
+                    <input type="radio" name="eventoCor" value="#3498db">
+                </div>
+                <div class="color-option" style="background-color: #2ecc71;" data-cor="#2ecc71">
+                    <input type="radio" name="eventoCor" value="#2ecc71">
+                </div>
+                <div class="color-option" style="background-color: #e74c3c;" data-cor="#e74c3c">
+                    <input type="radio" name="eventoCor" value="#e74c3c">
+                </div>
+                <div class="color-option" style="background-color: #9b59b6;" data-cor="#9b59b6">
+                    <input type="radio" name="eventoCor" value="#9b59b6">
+                </div>
+                <div class="color-option" style="background-color: #f1c40f;" data-cor="#f1c40f">
+                    <input type="radio" name="eventoCor" value="#f1c40f">
+                </div>
+                <div class="color-option" style="background-color: #1abc9c;" data-cor="#1abc9c">
+                    <input type="radio" name="eventoCor" value="#1abc9c">
+                </div>
+                <div class="color-option" style="background-color: #e67e22;" data-cor="#e67e22">
+                    <input type="radio" name="eventoCor" value="#e67e22">
+                </div>
+            </div>
+        </div>
+
         <div class="modal-actions">
             <button class="modal-btn" id="cancelar-evento">Cancelar</button>
             <button class="modal-btn primary" id="salvar-evento">Criar Evento</button>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL EDITAR NOTIFICAÇÃO -->
-<div id="modal-editar-notificacao" class="modal-overlay">
-    <div class="modal-card">
-        <span class="close-icon" id="close-editar-notif-modal">&times;</span>
-        <h2><i class="fa-regular fa-pen-to-square" style="margin-right: 10px;"></i> Editar Notificação</h2>
-        <input type="hidden" id="editar-notif-id">
-        <input type="text" id="editar-notif-titulo" placeholder="Título" maxlength="100">
-        <textarea id="editar-notif-corpo" rows="4" placeholder="Escreva a mensagem..."></textarea>
-        <div class="modal-actions">
-            <button class="modal-btn" id="cancelar-editar-notif">Cancelar</button>
-            <button class="modal-btn primary" id="salvar-editar-notif">Salvar</button>
         </div>
     </div>
 </div>
@@ -700,6 +754,37 @@
             </select>
         </div>
 
+        <!-- SELETOR DE CORES PARA EDITAR EVENTO -->
+        <div class="color-picker">
+            <label>Cor da barrinha lateral:</label>
+            <div class="color-options" id="editar-evento-cores">
+                <div class="color-option" style="background-color: #e67e22;" data-cor="#e67e22">
+                    <input type="radio" name="editarEventoCor" value="#e67e22">
+                </div>
+                <div class="color-option" style="background-color: #3498db;" data-cor="#3498db">
+                    <input type="radio" name="editarEventoCor" value="#3498db">
+                </div>
+                <div class="color-option" style="background-color: #2ecc71;" data-cor="#2ecc71">
+                    <input type="radio" name="editarEventoCor" value="#2ecc71">
+                </div>
+                <div class="color-option" style="background-color: #e74c3c;" data-cor="#e74c3c">
+                    <input type="radio" name="editarEventoCor" value="#e74c3c">
+                </div>
+                <div class="color-option" style="background-color: #9b59b6;" data-cor="#9b59b6">
+                    <input type="radio" name="editarEventoCor" value="#9b59b6">
+                </div>
+                <div class="color-option" style="background-color: #f1c40f;" data-cor="#f1c40f">
+                    <input type="radio" name="editarEventoCor" value="#f1c40f">
+                </div>
+                <div class="color-option" style="background-color: #1abc9c;" data-cor="#1abc9c">
+                    <input type="radio" name="editarEventoCor" value="#1abc9c">
+                </div>
+                <div class="color-option" style="background-color: #e67e22;" data-cor="#e67e22">
+                    <input type="radio" name="editarEventoCor" value="#e67e22">
+                </div>
+            </div>
+        </div>
+
         <div class="modal-actions">
             <button class="modal-btn" id="cancelar-editar-evento">Cancelar</button>
             <button class="modal-btn primary" id="salvar-editar-evento">Salvar</button>
@@ -722,6 +807,38 @@
         </select>
         <input type="text" id="cargo-serie" placeholder="Série (ex: 1º Médio)" maxlength="50">
         <input type="text" id="cargo-descricao" placeholder="Descrição do cargo (ex: Presidente)" maxlength="100">
+        
+        <!-- SELETOR DE CORES PARA CARGO -->
+        <div class="color-picker">
+            <label>Cor da barrinha lateral:</label>
+            <div class="color-options" id="cargo-cores">
+                <div class="color-option selected" style="background-color: #8e44ad;" data-cor="#8e44ad">
+                    <input type="radio" name="cargoCor" value="#8e44ad" checked>
+                </div>
+                <div class="color-option" style="background-color: #2980b9;" data-cor="#2980b9">
+                    <input type="radio" name="cargoCor" value="#2980b9">
+                </div>
+                <div class="color-option" style="background-color: #27ae60;" data-cor="#27ae60">
+                    <input type="radio" name="cargoCor" value="#27ae60">
+                </div>
+                <div class="color-option" style="background-color: #c0392b;" data-cor="#c0392b">
+                    <input type="radio" name="cargoCor" value="#c0392b">
+                </div>
+                <div class="color-option" style="background-color: #f39c12;" data-cor="#f39c12">
+                    <input type="radio" name="cargoCor" value="#f39c12">
+                </div>
+                <div class="color-option" style="background-color: #16a085;" data-cor="#16a085">
+                    <input type="radio" name="cargoCor" value="#16a085">
+                </div>
+                <div class="color-option" style="background-color: #d35400;" data-cor="#d35400">
+                    <input type="radio" name="cargoCor" value="#d35400">
+                </div>
+                <div class="color-option" style="background-color: #8e44ad;" data-cor="#8e44ad">
+                    <input type="radio" name="cargoCor" value="#8e44ad">
+                </div>
+            </div>
+        </div>
+
         <div class="modal-actions">
             <button class="modal-btn" id="cancelar-cargo">Cancelar</button>
             <button class="modal-btn primary" id="salvar-cargo">Registrar</button>
@@ -745,6 +862,38 @@
         </select>
         <input type="text" id="editar-cargo-serie" placeholder="Série (ex: 1º Médio)" maxlength="50">
         <input type="text" id="editar-cargo-descricao" placeholder="Descrição do cargo (ex: Presidente)" maxlength="100">
+        
+        <!-- SELETOR DE CORES PARA EDITAR CARGO -->
+        <div class="color-picker">
+            <label>Cor da barrinha lateral:</label>
+            <div class="color-options" id="editar-cargo-cores">
+                <div class="color-option" style="background-color: #8e44ad;" data-cor="#8e44ad">
+                    <input type="radio" name="editarCargoCor" value="#8e44ad">
+                </div>
+                <div class="color-option" style="background-color: #2980b9;" data-cor="#2980b9">
+                    <input type="radio" name="editarCargoCor" value="#2980b9">
+                </div>
+                <div class="color-option" style="background-color: #27ae60;" data-cor="#27ae60">
+                    <input type="radio" name="editarCargoCor" value="#27ae60">
+                </div>
+                <div class="color-option" style="background-color: #c0392b;" data-cor="#c0392b">
+                    <input type="radio" name="editarCargoCor" value="#c0392b">
+                </div>
+                <div class="color-option" style="background-color: #f39c12;" data-cor="#f39c12">
+                    <input type="radio" name="editarCargoCor" value="#f39c12">
+                </div>
+                <div class="color-option" style="background-color: #16a085;" data-cor="#16a085">
+                    <input type="radio" name="editarCargoCor" value="#16a085">
+                </div>
+                <div class="color-option" style="background-color: #d35400;" data-cor="#d35400">
+                    <input type="radio" name="editarCargoCor" value="#d35400">
+                </div>
+                <div class="color-option" style="background-color: #8e44ad;" data-cor="#8e44ad">
+                    <input type="radio" name="editarCargoCor" value="#8e44ad">
+                </div>
+            </div>
+        </div>
+
         <div class="modal-actions">
             <button class="modal-btn" id="cancelar-editar-cargo">Cancelar</button>
             <button class="modal-btn primary" id="salvar-editar-cargo">Salvar</button>
@@ -883,6 +1032,21 @@
         });
     });
 
+    // Função para inicializar seletores de cor
+    function initColorPickers() {
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const container = this.parentElement;
+                container.querySelectorAll('.color-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.classList.add('selected');
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) radio.checked = true;
+            });
+        });
+    }
+
     // Login
     btnLogin.addEventListener('click', async () => {
         try {
@@ -920,6 +1084,9 @@
                 btnNovoEvento.style.display = 'none';
                 document.getElementById('btn-registrar-cargo').style.display = 'none';
             }
+
+            // Inicializa seletores de cor
+            initColorPickers();
 
             // Inicia snapshot das notificações para o badge
             carregarBadgeNotificacoes(user.uid);
@@ -973,6 +1140,7 @@
             snapshot.forEach(doc => {
                 const ev = doc.data();
                 const admin = isAdmin(auth.currentUser);
+                const cor = ev.cor || '#e67e22';
 
                 let dataStr = '';
                 if (ev.dataTipo === 'semanal' && ev.diaSemana) {
@@ -994,7 +1162,7 @@
                 }
 
                 html += `
-                    <div class="evento-item" data-id="${doc.id}">
+                    <div class="evento-item" data-id="${doc.id}" style="border-left-color: ${cor};">
                         <h4>${ev.titulo || 'Sem título'}</h4>
                         <p>${ev.descricao || ''}</p>
                         <small><i class="fa-regular fa-calendar"></i> ${dataStr}</small>
@@ -1029,13 +1197,14 @@
             snapshot.forEach(doc => {
                 const membro = doc.data();
                 const admin = isAdmin(auth.currentUser);
+                const cor = membro.cor || '#8e44ad';
 
                 html += `
-                    <div class="membro-item" data-id="${doc.id}">
+                    <div class="membro-item" data-id="${doc.id}" style="border-left-color: ${cor};">
                         <h4>${membro.nome || 'Nome não informado'}</h4>
                         <p><i class="fa-regular fa-clock"></i> Turno: ${membro.turno || 'Não informado'}</p>
                         <p><i class="fa-regular fa-book"></i> Série: ${membro.serie || 'Não informado'}</p>
-                        <div class="cargo-badge"><i class="fa-solid fa-shield-halved"></i> ${membro.descricao || 'Membro'}</div>
+                        <div class="cargo-badge" style="background: ${cor};"> <i class="fa-solid fa-shield-halved"></i> ${membro.descricao || 'Membro'}</div>
                         ${admin ? `
                         <div class="item-actions">
                             <i class="fa-regular fa-pen-to-square" onclick="editarMembro('${doc.id}')"></i>
@@ -1149,6 +1318,10 @@
         document.querySelector('input[name="tipoData"][value="especifica"]').checked = true;
         campoDataEspecifica.style.display = 'block';
         campoDiaSemana.style.display = 'none';
+        // Reset cor para padrão
+        document.querySelectorAll('#evento-cores .color-option').forEach(opt => opt.classList.remove('selected'));
+        document.querySelector('#evento-cores .color-option[data-cor="#e67e22"]').classList.add('selected');
+        document.querySelector('input[name="eventoCor"][value="#e67e22"]').checked = true;
         showModal(modalCriarEvento);
     });
 
@@ -1156,6 +1329,7 @@
         const titulo = document.getElementById('evento-titulo').value.trim();
         const descricao = document.getElementById('evento-descricao').value.trim();
         const tipoData = document.querySelector('input[name="tipoData"]:checked').value;
+        const cor = document.querySelector('input[name="eventoCor"]:checked')?.value || '#e67e22';
 
         if (!titulo || !descricao) {
             mostrarConfirmacao("Campos vazios", "Preencha título e descrição.");
@@ -1167,7 +1341,8 @@
             descricao,
             criadoPor: auth.currentUser?.email || 'admin',
             dataTipo: tipoData,
-            createdAt: new Date()
+            createdAt: new Date(),
+            cor: cor
         };
 
         if (tipoData === 'especifica') {
@@ -1198,6 +1373,10 @@
         document.getElementById('cargo-turno').value = '';
         document.getElementById('cargo-serie').value = '';
         document.getElementById('cargo-descricao').value = '';
+        // Reset cor para padrão
+        document.querySelectorAll('#cargo-cores .color-option').forEach(opt => opt.classList.remove('selected'));
+        document.querySelector('#cargo-cores .color-option[data-cor="#8e44ad"]').classList.add('selected');
+        document.querySelector('input[name="cargoCor"][value="#8e44ad"]').checked = true;
         showModal(modalRegistrarCargo);
     });
 
@@ -1206,6 +1385,7 @@
         const turno = document.getElementById('cargo-turno').value;
         const serie = document.getElementById('cargo-serie').value.trim();
         const descricao = document.getElementById('cargo-descricao').value.trim();
+        const cor = document.querySelector('input[name="cargoCor"]:checked')?.value || '#8e44ad';
 
         if (!nome || !turno || !serie || !descricao) {
             mostrarConfirmacao("Campos vazios", "Preencha todos os campos.");
@@ -1218,6 +1398,7 @@
                 turno,
                 serie,
                 descricao,
+                cor,
                 criadoPor: auth.currentUser?.email || 'admin',
                 createdAt: new Date()
             });
@@ -1241,6 +1422,17 @@
                 document.getElementById('editar-cargo-turno').value = membro.turno || '';
                 document.getElementById('editar-cargo-serie').value = membro.serie || '';
                 document.getElementById('editar-cargo-descricao').value = membro.descricao || '';
+                
+                // Set cor
+                const cor = membro.cor || '#8e44ad';
+                document.querySelectorAll('#editar-cargo-cores .color-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (opt.dataset.cor === cor) {
+                        opt.classList.add('selected');
+                        opt.querySelector('input[type="radio"]').checked = true;
+                    }
+                });
+                
                 showModal(modalEditarCargo);
             }
         } catch (e) {
@@ -1255,6 +1447,7 @@
         const turno = document.getElementById('editar-cargo-turno').value;
         const serie = document.getElementById('editar-cargo-serie').value.trim();
         const descricao = document.getElementById('editar-cargo-descricao').value.trim();
+        const cor = document.querySelector('input[name="editarCargoCor"]:checked')?.value || '#8e44ad';
 
         if (!nome || !turno || !serie || !descricao) {
             mostrarConfirmacao("Campos vazios", "Preencha todos os campos.");
@@ -1266,7 +1459,8 @@
                 nome,
                 turno,
                 serie,
-                descricao
+                descricao,
+                cor
             });
             mostrarConfirmacao("Sucesso", "Membro atualizado com sucesso!");
             hideModal(modalEditarCargo);
@@ -1357,6 +1551,17 @@
                         document.getElementById('editar-evento-data').value = dataStr;
                     }
                 }
+
+                // Set cor
+                const cor = evento.cor || '#e67e22';
+                document.querySelectorAll('#editar-evento-cores .color-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (opt.dataset.cor === cor) {
+                        opt.classList.add('selected');
+                        opt.querySelector('input[type="radio"]').checked = true;
+                    }
+                });
+
                 showModal(modalEditarEvento);
             }
         } catch (e) {
@@ -1394,6 +1599,7 @@
         const titulo = document.getElementById('editar-evento-titulo').value.trim();
         const descricao = document.getElementById('editar-evento-descricao').value.trim();
         const tipoData = document.querySelector('input[name="editarTipoData"]:checked').value;
+        const cor = document.querySelector('input[name="editarEventoCor"]:checked')?.value || '#e67e22';
 
         if (!titulo || !descricao) {
             mostrarConfirmacao("Campos vazios", "Preencha título e descrição.");
@@ -1403,7 +1609,8 @@
         const updateData = {
             titulo,
             descricao,
-            dataTipo: tipoData
+            dataTipo: tipoData,
+            cor: cor
         };
 
         if (tipoData === 'especifica') {

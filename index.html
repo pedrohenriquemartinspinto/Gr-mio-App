@@ -318,10 +318,22 @@
             transition: 0.2s;
         }
         .nav-item i { font-size: 1.4rem; margin-bottom: 2px; }
+        .nav-item span { font-size: 0.7rem; font-weight: 500; }
         .nav-item.active {
             background: #0b2b5c;
             color: white;
             box-shadow: 0 6px 14px rgba(0,82,155,0.4);
+        }
+        .nav-item.sair {
+            color: #e53e3e;
+        }
+        .nav-item.sair:hover {
+            background: rgba(229, 62, 62, 0.1);
+        }
+        .nav-item.sair.active {
+            background: #e53e3e;
+            color: white;
+            box-shadow: 0 6px 14px rgba(229, 62, 62, 0.4);
         }
 
         /* MODAIS */
@@ -519,7 +531,7 @@
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            Google
+            Continue com o Google
         </button>
     </div>
 </div>
@@ -601,10 +613,26 @@
 
     <!-- BOTTOM NAVIGATION -->
     <nav class="bottom-nav">
-        <div class="nav-item active" id="nav-inicio"><i class="fa-solid fa-house"></i></div>
-        <div class="nav-item" id="nav-agenda"><i class="fa-solid fa-calendar-days"></i></div>
-        <div class="nav-item" id="nav-gestao"><i class="fa-solid fa-shield-halved"></i></div>
-        <div class="nav-item" id="nav-plus" style="display: none;"><i class="fa-solid fa-plus"></i></div>
+        <div class="nav-item active" id="nav-inicio">
+            <i class="fa-solid fa-house"></i>
+            <span>Início</span>
+        </div>
+        <div class="nav-item" id="nav-agenda">
+            <i class="fa-solid fa-calendar-days"></i>
+            <span>Agenda</span>
+        </div>
+        <div class="nav-item" id="nav-gestao">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Gestão</span>
+        </div>
+        <div class="nav-item" id="nav-plus" style="display: none;">
+            <i class="fa-solid fa-plus"></i>
+            <span>Admin</span>
+        </div>
+        <div class="nav-item sair" id="nav-sair">
+            <i class="fa-solid fa-sign-out-alt"></i>
+            <span>Sair</span>
+        </div>
     </nav>
 </div>
 
@@ -845,7 +873,7 @@
     };
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, getDocs, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
     const app = initializeApp(firebaseConfig);
@@ -863,6 +891,7 @@
     const userNome = document.getElementById('user-nome');
     const btnLogin = document.getElementById('btn-login');
     const navPlus = document.getElementById('nav-plus');
+    const navSair = document.getElementById('nav-sair');
     const notifBadge = document.getElementById('notif-badge');
     const btnNovoEvento = document.getElementById('btn-novo-evento');
 
@@ -1006,6 +1035,17 @@
         } catch (error) {
             console.error(error);
             mostrarConfirmacao("Erro no login", "Não foi possível entrar com Google.");
+        }
+    });
+
+    // Logout
+    navSair.addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+            mostrarConfirmacao("Até logo!", "Você saiu da sua conta.");
+        } catch (error) {
+            console.error(error);
+            mostrarConfirmacao("Erro", "Não foi possível sair da conta.");
         }
     });
 

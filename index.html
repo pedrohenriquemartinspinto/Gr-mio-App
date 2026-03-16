@@ -590,22 +590,34 @@
         .message-views {
             display: flex;
             align-items: center;
-            gap: 4px;
-            margin-top: 8px;
-            font-size: 0.75rem;
-            color: #64748b;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: rgba(11, 43, 92, 0.05);
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: #0b2b5c;
+            transition: all 0.2s ease;
+            width: fit-content;
         }
+        
+        .message-views:hover {
+            background: rgba(11, 43, 92, 0.1);
+            transform: translateY(-1px);
+        }
+        
         .viewers-avatars {
             display: flex;
             align-items: center;
         }
         .viewer-avatar {
-            width: 20px;
-            height: 20px;
-            border-radius: 10px;
+            width: 24px;
+            height: 24px;
+            border-radius: 12px;
             border: 2px solid white;
-            margin-right: -6px;
+            margin-right: -8px;
             object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .viewer-avatar:last-child {
             margin-right: 0;
@@ -894,8 +906,8 @@
             display: flex;
             gap: 12px;
             justify-content: flex-end;
-            margin-top: 8px;
-            opacity: 0;
+            margin-top: 12px;
+            opacity: 0.5;
             transition: opacity 0.2s;
         }
 
@@ -904,10 +916,11 @@
         }
 
         .message-actions i {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: #64748b;
             cursor: pointer;
             transition: 0.2s;
+            padding: 4px;
         }
 
         .own-message .message-actions i {
@@ -1002,6 +1015,61 @@
                 margin: 10px;
                 padding: 8px 16px;
             }
+        }
+
+        /* Estilo para o modal de visualizações */
+        .visualizacao-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(11, 43, 92, 0.1);
+        }
+        
+        .visualizacao-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(11, 43, 92, 0.1);
+            border-color: #0b2b5c;
+        }
+        
+        .visualizacao-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            object-fit: cover;
+            border: 2px solid #0b2b5c;
+        }
+        
+        .visualizacao-info {
+            flex: 1;
+        }
+        
+        .visualizacao-nome {
+            font-weight: 700;
+            color: #0b2b5c;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        
+        .visualizacao-data {
+            font-size: 0.8rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .contador-visualizacoes {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #eef2f6;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: #0b2b5c;
         }
     </style>
 </head>
@@ -1472,6 +1540,20 @@
     </div>
 </div>
 
+<!-- NOVO MODAL VISUALIZAÇÕES DA MENSAGEM -->
+<div id="modal-visualizacoes" class="modal-overlay">
+    <div class="modal-card" style="max-width: 400px;">
+        <span class="close-icon" id="close-visualizacoes-modal">&times;</span>
+        <h2><i class="fa-regular fa-eye" style="margin-right: 10px;"></i> Visualizações</h2>
+        <div id="visualizacoes-lista" style="max-height: 400px; overflow-y: auto; margin-top: 20px;">
+            <p style="color:#94a3b8; text-align:center;">Carregando...</p>
+        </div>
+        <div class="modal-actions" style="margin-top: 20px;">
+            <button class="modal-btn primary" id="fechar-visualizacoes">Fechar</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     // Configuração do Firebase
     const firebaseConfig = {
@@ -1538,6 +1620,7 @@
     const modalEditarCargo = document.getElementById('modal-editar-cargo');
     const modalEditarMensagem = document.getElementById('modal-editar-mensagem');
     const modalRegistrarAcao = document.getElementById('modal-registrar-acao');
+    const modalVisualizacoes = document.getElementById('modal-visualizacoes');
 
     // Botões fechar
     const closeNotif = document.getElementById('close-notif-modal');
@@ -1562,6 +1645,8 @@
     const closeAcao = document.getElementById('close-acao-modal');
     const cancelarAcao = document.getElementById('cancelar-acao');
     const salvarAcao = document.getElementById('salvar-acao');
+    const closeVisualizacoes = document.getElementById('close-visualizacoes-modal');
+    const fecharVisualizacoes = document.getElementById('fechar-visualizacoes');
 
     // Previews de cor
     const eventoCor = document.getElementById('evento-cor');
@@ -1579,6 +1664,8 @@
     let imagemSelecionada = null;
     let typingTimeout = null;
     let acaoSelecionada = 'bloquear-palavra';
+    let visualizacoesUpdateInterval = null;
+    let mensagemVisualizacoesAtual = null;
 
     // Variáveis para drag and drop
     let dragSourceId = null;
@@ -2134,7 +2221,92 @@
         }
     }
 
-    // Função para carregar mensagens em tempo real
+    // Função para abrir modal de visualizações
+    window.verVisualizacoes = async function(mensagemId) {
+        mensagemVisualizacoesAtual = mensagemId;
+        const visualizacoesLista = document.getElementById('visualizacoes-lista');
+        visualizacoesLista.innerHTML = '<p style="color:#94a3b8; text-align:center;">Carregando visualizações...</p>';
+        showModal(modalVisualizacoes);
+        
+        // Carregar visualizações imediatamente
+        await carregarVisualizacoes(mensagemId);
+        
+        // Iniciar atualização periódica (a cada 3 segundos)
+        if (visualizacoesUpdateInterval) {
+            clearInterval(visualizacoesUpdateInterval);
+        }
+        
+        visualizacoesUpdateInterval = setInterval(() => {
+            if (mensagemVisualizacoesAtual && modalVisualizacoes.classList.contains('active')) {
+                carregarVisualizacoes(mensagemVisualizacoesAtual);
+            }
+        }, 3000);
+    };
+
+    // Função para carregar visualizações
+    async function carregarVisualizacoes(mensagemId) {
+        try {
+            const visualizacoesLista = document.getElementById('visualizacoes-lista');
+            const visualizacoesSnap = await getDocs(collection(db, "mensagens", mensagemId, "visualizacoes"));
+            
+            if (visualizacoesSnap.empty) {
+                visualizacoesLista.innerHTML = '<p style="color:#94a3b8; text-align:center;">Ninguém visualizou esta mensagem ainda.</p>';
+                return;
+            }
+
+            // Ordenar visualizações por data (mais recentes primeiro)
+            const visualizacoes = [];
+            visualizacoesSnap.forEach(doc => {
+                const vis = doc.data();
+                visualizacoes.push(vis);
+            });
+            
+            // Ordenar por timestamp decrescente
+            visualizacoes.sort((a, b) => {
+                if (!a.timestamp) return 1;
+                if (!b.timestamp) return -1;
+                return b.timestamp.seconds - a.timestamp.seconds;
+            });
+
+            let html = `<div class="contador-visualizacoes">
+                <i class="fa-regular fa-eye" style="margin-right: 6px;"></i>
+                ${visualizacoes.length} ${visualizacoes.length === 1 ? 'pessoa visualizou' : 'pessoas visualizaram'}
+            </div>`;
+            
+            html += '<div style="display: flex; flex-direction: column; gap: 12px;">';
+            
+            visualizacoes.forEach(vis => {
+                const data = vis.timestamp?.toDate ? vis.timestamp.toDate() : new Date();
+                const hora = data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const dataFormatada = data.toLocaleDateString();
+                
+                html += `
+                    <div class="visualizacao-card">
+                        <img src="${vis.usuarioFoto || 'https://via.placeholder.com/48'}" 
+                             class="visualizacao-avatar"
+                             onerror="this.src='https://via.placeholder.com/48'"
+                             alt="avatar">
+                        <div class="visualizacao-info">
+                            <div class="visualizacao-nome">${vis.usuarioNome || 'Usuário'}</div>
+                            <div class="visualizacao-data">
+                                <i class="fa-regular fa-clock"></i>
+                                ${hora} - ${dataFormatada}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+            
+            visualizacoesLista.innerHTML = html;
+        } catch (e) {
+            console.error("Erro ao carregar visualizações:", e);
+            document.getElementById('visualizacoes-lista').innerHTML = '<p style="color:#e74c3c; text-align:center;">Erro ao carregar visualizações.</p>';
+        }
+    }
+
+    // Função modificada para carregar mensagens em tempo real
     function carregarMensagensTempoReal() {
         const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
 
@@ -2163,31 +2335,40 @@
                 const hora = data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const dataFormatada = data.toLocaleDateString();
 
-                let visualizacoesHtml = '';
+                // Buscar contagem de visualizações
+                let visualizacoesCount = 0;
+                let primeirasVisualizacoes = [];
                 try {
                     const visualizacoesSnap = await getDocs(collection(db, "mensagens", doc.id, "visualizacoes"));
-                    if (!visualizacoesSnap.empty) {
-                        const visualizacoes = [];
-                        visualizacoesSnap.forEach(v => {
-                            const vis = v.data();
-                            visualizacoes.push(vis);
-                        });
-                        
-                        if (visualizacoes.length > 0) {
-                            visualizacoesHtml = `
-                                <div class="message-views">
-                                    <div class="viewers-avatars">
-                                        ${visualizacoes.slice(0, 3).map(v => `
-                                            <img src="${v.usuarioFoto || 'https://via.placeholder.com/20'}" class="viewer-avatar" title="${v.usuarioNome}" onerror="this.src='https://via.placeholder.com/20'">
-                                        `).join('')}
-                                    </div>
-                                    <span>${visualizacoes.length} ${visualizacoes.length === 1 ? 'visualização' : 'visualizações'}</span>
-                                </div>
-                            `;
+                    visualizacoesCount = visualizacoesSnap.size;
+                    
+                    // Pegar as 3 primeiras visualizações para os avatares
+                    visualizacoesSnap.forEach(v => {
+                        if (primeirasVisualizacoes.length < 3) {
+                            primeirasVisualizacoes.push(v.data());
                         }
-                    }
+                    });
                 } catch (e) {
                     console.error("Erro ao carregar visualizações:", e);
+                }
+
+                // HTML das visualizações (agora clicável)
+                let visualizacoesHtml = '';
+                if (visualizacoesCount > 0) {
+                    visualizacoesHtml = `
+                        <div class="message-views" onclick="window.verVisualizacoes('${doc.id}')" style="cursor: pointer;">
+                            <div class="viewers-avatars">
+                                ${primeirasVisualizacoes.map(v => `
+                                    <img src="${v.usuarioFoto || 'https://via.placeholder.com/20'}" class="viewer-avatar" title="${v.usuarioNome}" onerror="this.src='https://via.placeholder.com/20'">
+                                `).join('')}
+                                ${visualizacoesCount > 3 ? `<span class="viewer-avatar" style="background: #0b2b5c; color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 600;">+${visualizacoesCount - 3}</span>` : ''}
+                            </div>
+                            <span style="display: flex; align-items: center; gap: 4px;">
+                                <i class="fa-regular fa-eye"></i>
+                                ${visualizacoesCount} ${visualizacoesCount === 1 ? 'visualização' : 'visualizações'}
+                            </span>
+                        </div>
+                    `;
                 }
 
                 const textoEscapado = msg.texto ? msg.texto.replace(/'/g, "\\'") : '';
@@ -2217,6 +2398,7 @@
                             
                             <div class="message-actions">
                                 <i class="fa-regular fa-reply" onclick="window.responderMensagem('${doc.id}', '${textoEscapado || ''}', '${autorNomeEscapado}')" title="Responder"></i>
+                                <i class="fa-regular fa-eye" onclick="window.verVisualizacoes('${doc.id}')" title="Ver visualizações"></i>
                                 ${isOwnMessage ? `
                                     <i class="fa-regular fa-pen-to-square" onclick="window.editarMensagem('${doc.id}', '${textoEscapado || ''}')" title="Editar"></i>
                                     <i class="fa-regular fa-trash-can" onclick="window.excluirMensagem('${doc.id}')" title="Excluir"></i>
@@ -2228,14 +2410,51 @@
                     </div>
                 `;
             }
-            chatMessages.innerHTML = html;
             
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            // Atualizar apenas se o conteúdo mudou (evita piscar)
+            if (chatMessages.innerHTML !== html) {
+                const scrollPos = chatMessages.scrollTop;
+                const wasAtBottom = chatMessages.scrollHeight - chatMessages.scrollTop <= chatMessages.clientHeight + 100;
+                
+                chatMessages.innerHTML = html;
+                
+                // Manter scroll position ou ir para o final se estava no final
+                if (wasAtBottom) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    chatMessages.scrollTop = scrollPos;
+                }
+            }
+            
+            // Se o modal de visualizações estiver aberto, atualizar silenciosamente
+            if (modalVisualizacoes.classList.contains('active') && mensagemVisualizacoesAtual) {
+                carregarVisualizacoes(mensagemVisualizacoesAtual);
+            }
         }, (error) => {
             console.error("Erro no snapshot de mensagens:", error);
             chatMessages.innerHTML = '<p>Erro ao carregar mensagens.</p>';
         });
     }
+
+    // Função para fechar modal de visualizações
+    function fecharModalVisualizacoes() {
+        hideModal(modalVisualizacoes);
+        if (visualizacoesUpdateInterval) {
+            clearInterval(visualizacoesUpdateInterval);
+            visualizacoesUpdateInterval = null;
+        }
+        mensagemVisualizacoesAtual = null;
+    }
+
+    closeVisualizacoes.addEventListener('click', fecharModalVisualizacoes);
+    fecharVisualizacoes.addEventListener('click', fecharModalVisualizacoes);
+    
+    // Fechar ao clicar fora
+    modalVisualizacoes.addEventListener('click', (e) => {
+        if (e.target === modalVisualizacoes) {
+            fecharModalVisualizacoes();
+        }
+    });
 
     window.responderMensagem = function(id, texto, autorNome) {
         mensagemParaResponder = {
@@ -3285,6 +3504,12 @@
                 
                 mensagemParaResponder = null;
                 chatInput.placeholder = 'Digite sua mensagem...';
+
+                // Limpar intervalo de visualizações ao mudar de aba
+                if (visualizacoesUpdateInterval) {
+                    clearInterval(visualizacoesUpdateInterval);
+                    visualizacoesUpdateInterval = null;
+                }
             });
         }
     }

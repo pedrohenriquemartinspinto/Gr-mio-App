@@ -240,7 +240,7 @@
         }
 
         /* ITENS DE LISTA - AJUSTE PARA EVITAR SOBREPOSIÇÃO DOS ÍCONES */
-        .notificacao-item, .evento-item, .membro-item {
+        .notificacao-item, .evento-item, .membro-item, .usuario-item {
             background: white;
             border-radius: 24px;
             padding: 18px 60px 18px 18px;
@@ -249,12 +249,37 @@
             box-shadow: 0 5px 12px rgba(0,0,0,0.03);
             position: relative;
             word-wrap: break-word;
+            transition: all 0.2s ease;
         }
+        
+        /* Estilo para item sendo arrastado */
+        .membro-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+            cursor: grabbing;
+        }
+        
+        /* Estilo para área de drop */
+        .membro-item.drag-over {
+            border: 2px dashed #0b2b5c;
+            transform: translateY(5px);
+        }
+        
+        /* Indicador visual de que pode arrastar (só para admin) */
+        .admin .membro-item {
+            cursor: grab;
+        }
+        
+        .admin .membro-item:active {
+            cursor: grabbing;
+        }
+        
         .evento-item { border-left-color: #e67e22; }
         .membro-item { border-left-color: #8e44ad; }
-        .notificacao-item h4, .evento-item h4, .membro-item h4 { font-weight: 700; font-size: 1.2rem; margin-bottom: 6px; }
-        .notificacao-item p, .evento-item p, .membro-item p { margin-bottom: 8px; }
-        .notificacao-item small, .evento-item small, .membro-item small { color: #64748b; display: block; }
+        .usuario-item { border-left-color: #3498db; }
+        .notificacao-item h4, .evento-item h4, .membro-item h4, .usuario-item h4 { font-weight: 700; font-size: 1.2rem; margin-bottom: 6px; }
+        .notificacao-item p, .evento-item p, .membro-item p, .usuario-item p { margin-bottom: 8px; }
+        .notificacao-item small, .evento-item small, .membro-item small, .usuario-item small { color: #64748b; display: block; }
         .item-actions {
             position: absolute;
             top: 15px;
@@ -276,17 +301,45 @@
         .item-actions i.fa-check-circle:hover { color: #2ecc71; }
         .item-actions i.fa-pen-to-square:hover { color: #f39c12; }
         .item-actions i.fa-trash-can:hover { color: #e74c3c; }
+        .item-actions i.fa-ban:hover { color: #e74c3c; }
+        
+        /* Ícone de arrastar (só aparece para admin) */
+        .drag-handle {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 1.2rem;
+            color: #64748b;
+            cursor: grab;
+            display: none;
+        }
+        
+        .admin .drag-handle {
+            display: block;
+        }
+        
+        .admin .membro-item {
+            padding-left: 45px;
+        }
 
         /* Ajuste fino para telas pequenas */
         @media (max-width: 480px) {
-            .notificacao-item, .evento-item, .membro-item {
+            .notificacao-item, .evento-item, .membro-item, .usuario-item {
                 padding: 15px 50px 15px 15px;
+            }
+            .admin .membro-item {
+                padding-left: 40px;
             }
             .item-actions {
                 top: 12px;
                 right: 12px;
             }
             .item-actions i {
+                font-size: 1rem;
+            }
+            .drag-handle {
+                top: 12px;
+                left: 8px;
                 font-size: 1rem;
             }
         }
@@ -455,7 +508,109 @@
             box-shadow: 0 0 0 4px rgba(11,43,92,0.1);
         }
         
-        /* Seletor de cor */
+        /* Seletor de ação */
+        .acao-selector {
+            margin-bottom: 20px;
+        }
+        .acao-option {
+            background: #f0f4fa;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid transparent;
+        }
+        .acao-option:hover {
+            background: #e6ecf5;
+        }
+        .acao-option.selected {
+            border-color: #0b2b5c;
+            background: #e1e8f2;
+        }
+        .acao-option h4 {
+            margin-bottom: 4px;
+            color: #0b2b5c;
+        }
+        .acao-option p {
+            font-size: 0.9rem;
+            color: #4a5a72;
+        }
+        
+        .campo-acao {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dde3ea;
+        }
+        
+        /* Lista de usuários */
+        .usuarios-lista {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 16px 0;
+        }
+        .usuario-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f0f4fa;
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        .usuario-card img {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            object-fit: cover;
+        }
+        .usuario-info {
+            flex: 1;
+        }
+        .usuario-info strong {
+            display: block;
+            color: #0b2b5c;
+        }
+        .usuario-info small {
+            color: #64748b;
+        }
+        .usuario-card .btn-icon-small {
+            background: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #e74c3c;
+        }
+        
+        /* Visualizações da mensagem */
+        .message-views {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .viewers-avatars {
+            display: flex;
+            align-items: center;
+        }
+        .viewer-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            border: 2px solid white;
+            margin-right: -6px;
+            object-fit: cover;
+        }
+        .viewer-avatar:last-child {
+            margin-right: 0;
+        }
+        
         .cor-selector {
             margin-bottom: 16px;
         }
@@ -579,6 +734,275 @@
             display: inline-block;
             margin-top: 8px;
         }
+
+        /* ===== ESTILOS DO CHAT ===== */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: transparent;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .typing-indicator {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            color: #0b2b5c;
+            font-style: italic;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(5px);
+            border-radius: 30px;
+            margin: 0 20px 10px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #0b2b5c;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: 0s; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+
+        .message-wrapper.own-message {
+            align-self: flex-end;
+        }
+
+        .message-bubble {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .own-message .message-bubble {
+            background: #0b2b5c;
+            color: white;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .message-author-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .own-message .message-header {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .own-message .message-author-avatar {
+            border: 1px solid white;
+        }
+
+        .message-author {
+            font-weight: 700;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-left: auto;
+        }
+
+        .message-content {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .message-image {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 16px;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .message-image:hover {
+            transform: scale(1.02);
+        }
+
+        .message-reply {
+            background: rgba(0,0,0,0.05);
+            border-left: 4px solid #0b2b5c;
+            padding: 12px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .own-message .message-reply {
+            background: rgba(255,255,255,0.1);
+            border-left-color: white;
+        }
+
+        .reply-author {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .reply-content {
+            opacity: 0.8;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .message-wrapper:hover .message-actions {
+            opacity: 1;
+        }
+
+        .message-actions i {
+            font-size: 1rem;
+            color: #64748b;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .own-message .message-actions i {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .message-actions i:hover {
+            color: #0b2b5c;
+            transform: scale(1.1);
+        }
+
+        .own-message .message-actions i:hover {
+            color: white;
+        }
+
+        .chat-input-area {
+            background: white;
+            border-radius: 40px;
+            padding: 12px 20px;
+            margin: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            padding: 8px 0;
+        }
+
+        .chat-input-area button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #0b2b5c;
+            font-size: 1.5rem;
+            transition: 0.2s;
+        }
+
+        .chat-input-area button:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-input-area input[type="file"] {
+            display: none;
+        }
+
+        .image-preview {
+            position: relative;
+            max-width: 100px;
+            margin: 10px 20px;
+        }
+
+        .image-preview img {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        .image-preview button {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        /* Estilo para palavras bloqueadas */
+        .blocked-word {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+
+        @media (max-width: 480px) {
+            .message-wrapper {
+                max-width: 90%;
+            }
+            
+            .chat-input-area {
+                margin: 10px;
+                padding: 8px 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -641,7 +1065,7 @@
             </div>
         </div>
 
-        <!-- ABA GESTÃO (NOVA) -->
+        <!-- ABA GESTÃO -->
         <div id="gestao" class="tab-content">
             <div class="card">
                 <h3><i class="fa-solid fa-shield-halved" style="margin-right: 10px;"></i> Nossa Gestão</h3>
@@ -652,6 +1076,37 @@
             </div>
             <div id="membros-lista">
                 <p style="color: #5f6b7a;">Carregando membros da gestão...</p>
+            </div>
+        </div>
+
+        <!-- ABA CHAT -->
+        <div id="chat" class="tab-content">
+            <div class="chat-container">
+                <div class="typing-indicator" id="typing-indicator">
+                    <span id="typing-user"></span> está digitando
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Mensagens serão carregadas aqui -->
+                </div>
+                <div class="image-preview" id="image-preview" style="display: none;">
+                    <img id="preview-img" src="" alt="Preview">
+                    <button onclick="removerImagem()"><i class="fa-solid fa-times"></i></button>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Digite sua mensagem...">
+                    <input type="file" id="image-upload" accept="image/*">
+                    <button onclick="document.getElementById('image-upload').click()">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                    <button id="send-message">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -669,13 +1124,45 @@
             </div>
         </div>
 
+        <!-- NOVA ABA ACESSO (SÓ PARA ADMIN) -->
+        <div id="acesso" class="tab-content">
+            <div class="card">
+                <h3><i class="fa-solid fa-shield" style="margin-right: 10px;"></i> Controle de Acesso</h3>
+                <p>Gerencie permissões e bloqueios do sistema.</p>
+                <button id="btn-registrar-acao" class="btn-acao" style="margin-top: 16px;">
+                    <i class="fa-regular fa-gavel"></i> Registrar ação
+                </button>
+            </div>
+            
+            <div class="card">
+                <h4><i class="fa-solid fa-ban" style="margin-right: 8px;"></i> Palavras Bloqueadas</h4>
+                <div id="palavras-bloqueadas-lista">
+                    <p style="color: #5f6b7a;">Carregando...</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h4><i class="fa-solid fa-user-lock" style="margin-right: 8px;"></i> Contas Bloqueadas</h4>
+                <div id="contas-bloqueadas-lista">
+                    <p style="color: #5f6b7a;">Carregando...</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h4><i class="fa-solid fa-user-tie" style="margin-right: 8px;"></i> Administradores</h4>
+                <div id="admins-lista">
+                    <p style="color: #5f6b7a;">Carregando...</p>
+                </div>
+            </div>
+        </div>
+
         <!-- RODAPÉ PROFISSIONAL -->
         <footer class="app-footer">
             <span>Desenvolvido com 𓆩❤︎𓆪 por Pedro Henrique Martins – 1º I.</span>
         </footer>
     </main>
 
-    <!-- BOTTOM NAVIGATION - VERSÃO SUPER PREMIUM -->
+    <!-- BOTTOM NAVIGATION -->
     <nav class="bottom-nav">
         <div class="nav-item active" id="nav-inicio">
             <i class="fa-solid fa-house"></i>
@@ -688,6 +1175,14 @@
         <div class="nav-item" id="nav-gestao">
             <i class="fa-solid fa-shield-halved"></i>
             <span>Gestão</span>
+        </div>
+        <div class="nav-item" id="nav-chat">
+            <i class="fa-solid fa-comments"></i>
+            <span>Chat</span>
+        </div>
+        <div class="nav-item" id="nav-acesso" style="display: none;">
+            <i class="fa-solid fa-shield"></i>
+            <span>Acesso</span>
         </div>
         <div class="nav-item" id="nav-plus" style="display: none;">
             <i class="fa-solid fa-plus"></i>
@@ -779,7 +1274,6 @@
             </select>
         </div>
 
-        <!-- Seletor de cor para evento -->
         <div class="cor-selector">
             <label>Cor da barrinha:</label>
             <div class="cor-input-group">
@@ -844,7 +1338,6 @@
             </select>
         </div>
 
-        <!-- Seletor de cor para evento -->
         <div class="cor-selector">
             <label>Cor da barrinha:</label>
             <div class="cor-input-group">
@@ -876,7 +1369,6 @@
         <input type="text" id="cargo-serie" placeholder="Série (ex: 1º Médio)" maxlength="50">
         <input type="text" id="cargo-descricao" placeholder="Descrição do cargo (ex: Presidente)" maxlength="100">
         
-        <!-- Seletor de cor para cargo -->
         <div class="cor-selector">
             <label>Cor da barrinha:</label>
             <div class="cor-input-group">
@@ -909,7 +1401,6 @@
         <input type="text" id="editar-cargo-serie" placeholder="Série (ex: 1º Médio)" maxlength="50">
         <input type="text" id="editar-cargo-descricao" placeholder="Descrição do cargo (ex: Presidente)" maxlength="100">
         
-        <!-- Seletor de cor para cargo -->
         <div class="cor-selector">
             <label>Cor da barrinha:</label>
             <div class="cor-input-group">
@@ -921,6 +1412,62 @@
         <div class="modal-actions">
             <button class="modal-btn" id="cancelar-editar-cargo">Cancelar</button>
             <button class="modal-btn primary" id="salvar-editar-cargo">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR MENSAGEM -->
+<div id="modal-editar-mensagem" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-icon" id="close-editar-mensagem-modal">&times;</span>
+        <h2><i class="fa-regular fa-pen-to-square" style="margin-right: 10px;"></i> Editar Mensagem</h2>
+        <input type="hidden" id="editar-mensagem-id">
+        <textarea id="editar-mensagem-conteudo" rows="4" placeholder="Edite sua mensagem..."></textarea>
+        <div class="modal-actions">
+            <button class="modal-btn" id="cancelar-editar-mensagem">Cancelar</button>
+            <button class="modal-btn primary" id="salvar-editar-mensagem">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- NOVO MODAL REGISTRAR AÇÃO -->
+<div id="modal-registrar-acao" class="modal-overlay">
+    <div class="modal-card">
+        <span class="close-icon" id="close-acao-modal">&times;</span>
+        <h2><i class="fa-regular fa-gavel" style="margin-right: 10px;"></i> Registrar Ação</h2>
+        
+        <div class="acao-selector">
+            <div class="acao-option selected" data-acao="bloquear-palavra">
+                <h4><i class="fa-solid fa-ban"></i> Bloquear palavra</h4>
+                <p>Adicionar uma palavra que será bloqueada no chat</p>
+            </div>
+            <div class="acao-option" data-acao="adicionar-admin">
+                <h4><i class="fa-solid fa-user-tie"></i> Adicionar admin</h4>
+                <p>Conceder privilégios de administrador</p>
+            </div>
+            <div class="acao-option" data-acao="bloquear-conta">
+                <h4><i class="fa-solid fa-user-lock"></i> Bloquear conta</h4>
+                <p>Impedir que um usuário acesse o aplicativo</p>
+            </div>
+        </div>
+        
+        <div id="campo-bloquear-palavra" class="campo-acao">
+            <input type="text" id="nova-palavra" placeholder="Digite a palavra a ser bloqueada" maxlength="50">
+        </div>
+        
+        <div id="campo-adicionar-admin" class="campo-acao" style="display: none;">
+            <input type="email" id="novo-admin-email" placeholder="Email do novo administrador">
+        </div>
+        
+        <div id="campo-bloquear-conta" class="campo-acao" style="display: none;">
+            <div class="usuarios-lista" id="usuarios-lista">
+                <p style="color: #5f6b7a;">Carregando todos os usuários...</p>
+            </div>
+        </div>
+        
+        <div class="modal-actions">
+            <button class="modal-btn" id="cancelar-acao">Cancelar</button>
+            <button class="modal-btn primary" id="salvar-acao">Registrar</button>
         </div>
     </div>
 </div>
@@ -938,15 +1485,23 @@
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, getDoc, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, arrayUnion, where, Timestamp, writeBatch, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
 
-    // E-mails admin
-    const ADMIN_EMAILS = ["pintoteamopai1234@gmail.com", "outroadmin@gmail.com", "tais.cunico@edu.mt.gov.br", "stephanieluanagonchoroski@gmail.com", "mariaeduardacardososorriso25@gmail.com", "novodovosk.sabrina@gmail.com"];
+    // E-mails admin (iniciais)
+    let ADMIN_EMAILS = ["pintoteamopai1234@gmail.com", "outroadmin@gmail.com", "tais.cunico@edu.mt.gov.br", "stephanieluanagonchoroski@gmail.com", "mariaeduardacardososorriso25@gmail.com", "novodovosk.sabrina@gmail.com"];
+    
+    // Palavras bloqueadas (iniciais)
+    let PALAVRAS_BLOQUEADAS = ['puta', 'merda', 'filha da puta', 'caralho', 'porra', 'corno', 'vagabunda'];
+    
+    // Contas bloqueadas
+    let CONTAS_BLOQUEADAS = [];
 
     // Elementos DOM
     const loginScreen = document.getElementById('login-screen');
@@ -955,9 +1510,21 @@
     const userNome = document.getElementById('user-nome');
     const btnLogin = document.getElementById('btn-login');
     const navPlus = document.getElementById('nav-plus');
+    const navAcesso = document.getElementById('nav-acesso');
     const navSair = document.getElementById('nav-sair');
     const notifBadge = document.getElementById('notif-badge');
     const btnNovoEvento = document.getElementById('btn-novo-evento');
+    const navChat = document.getElementById('nav-chat');
+    
+    // Elementos do chat
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const sendMessageBtn = document.getElementById('send-message');
+    const imageUpload = document.getElementById('image-upload');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const typingUser = document.getElementById('typing-user');
 
     // Modais
     const modalNotif = document.getElementById('modal-notificacoes');
@@ -969,6 +1536,8 @@
     const modalConfirmarExcluir = document.getElementById('modal-confirmar-excluir');
     const modalRegistrarCargo = document.getElementById('modal-registrar-cargo');
     const modalEditarCargo = document.getElementById('modal-editar-cargo');
+    const modalEditarMensagem = document.getElementById('modal-editar-mensagem');
+    const modalRegistrarAcao = document.getElementById('modal-registrar-acao');
 
     // Botões fechar
     const closeNotif = document.getElementById('close-notif-modal');
@@ -987,6 +1556,12 @@
     const cancelarCargo = document.getElementById('cancelar-cargo');
     const closeEditarCargo = document.getElementById('close-editar-cargo-modal');
     const cancelarEditarCargo = document.getElementById('cancelar-editar-cargo');
+    const closeEditarMensagem = document.getElementById('close-editar-mensagem-modal');
+    const cancelarEditarMensagem = document.getElementById('cancelar-editar-mensagem');
+    const salvarEditarMensagem = document.getElementById('salvar-editar-mensagem');
+    const closeAcao = document.getElementById('close-acao-modal');
+    const cancelarAcao = document.getElementById('cancelar-acao');
+    const salvarAcao = document.getElementById('salvar-acao');
 
     // Previews de cor
     const eventoCor = document.getElementById('evento-cor');
@@ -997,6 +1572,21 @@
     const cargoCorPreview = document.getElementById('cargo-cor-preview');
     const editarCargoCor = document.getElementById('editar-cargo-cor');
     const editarCargoCorPreview = document.getElementById('editar-cargo-cor-preview');
+
+    // Variáveis de controle
+    let itemParaExcluir = { tipo: null, id: null };
+    let mensagemParaResponder = null;
+    let imagemSelecionada = null;
+    let typingTimeout = null;
+    let acaoSelecionada = 'bloquear-palavra';
+
+    // Variáveis para drag and drop
+    let dragSourceId = null;
+    let dragTargetId = null;
+    let membrosOrdenados = [];
+
+    // Flag para controlar se já migrou os dados
+    let migracaoRealizada = false;
 
     // Atualizar previews de cor
     if (eventoCor && eventoCorPreview) {
@@ -1023,10 +1613,870 @@
         });
     }
 
-    // Variável para controle de exclusão
-    let itemParaExcluir = { tipo: null, id: null };
+    // Seleção de ação no modal
+    document.querySelectorAll('.acao-option').forEach(option => {
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.acao-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            acaoSelecionada = option.dataset.acao;
+            
+            document.getElementById('campo-bloquear-palavra').style.display = 'none';
+            document.getElementById('campo-adicionar-admin').style.display = 'none';
+            document.getElementById('campo-bloquear-conta').style.display = 'none';
+            
+            if (acaoSelecionada === 'bloquear-palavra') {
+                document.getElementById('campo-bloquear-palavra').style.display = 'block';
+            } else if (acaoSelecionada === 'adicionar-admin') {
+                document.getElementById('campo-adicionar-admin').style.display = 'block';
+            } else if (acaoSelecionada === 'bloquear-conta') {
+                document.getElementById('campo-bloquear-conta').style.display = 'block';
+                carregarTodosUsuarios();
+            }
+        });
+    });
 
-    // Funções auxiliares
+    // Função para carregar configurações (palavras bloqueadas, admins, contas bloqueadas)
+    async function carregarConfiguracoes() {
+        try {
+            // Carregar palavras bloqueadas
+            const palavrasRef = collection(db, "configuracoes", "chat", "palavrasBloqueadas");
+            const palavrasSnapshot = await getDocs(palavrasRef);
+            if (!palavrasSnapshot.empty) {
+                PALAVRAS_BLOQUEADAS = [];
+                palavrasSnapshot.forEach(doc => {
+                    PALAVRAS_BLOQUEADAS.push(doc.data().palavra);
+                });
+            }
+            
+            // Carregar admins
+            const adminsRef = doc(db, "configuracoes", "admins");
+            const adminsDoc = await getDoc(adminsRef);
+            if (adminsDoc.exists()) {
+                ADMIN_EMAILS = adminsDoc.data().emails || ADMIN_EMAILS;
+            }
+            
+            // Carregar contas bloqueadas
+            const bloqueadosRef = collection(db, "configuracoes", "acesso", "bloqueados");
+            const bloqueadosSnapshot = await getDocs(bloqueadosRef);
+            CONTAS_BLOQUEADAS = [];
+            bloqueadosSnapshot.forEach(doc => {
+                CONTAS_BLOQUEADAS.push(doc.data().email);
+            });
+            
+            // Atualizar interfaces
+            atualizarListaPalavrasBloqueadas();
+            atualizarListaAdmins();
+            atualizarListaContasBloqueadas();
+        } catch (e) {
+            console.error("Erro ao carregar configurações:", e);
+        }
+    }
+
+    // Função para atualizar lista de palavras bloqueadas na UI
+    function atualizarListaPalavrasBloqueadas() {
+        const container = document.getElementById('palavras-bloqueadas-lista');
+        if (!container) return;
+        
+        if (PALAVRAS_BLOQUEADAS.length === 0) {
+            container.innerHTML = '<p style="color:#94a3b8;">Nenhuma palavra bloqueada.</p>';
+            return;
+        }
+        
+        let html = '';
+        PALAVRAS_BLOQUEADAS.forEach(palavra => {
+            html += `
+                <div class="usuario-item" style="border-left-color: #e74c3c;">
+                    <h4>${palavra}</h4>
+                    <div class="item-actions">
+                        <i class="fa-regular fa-trash-can" onclick="window.removerPalavraBloqueada('${palavra}')"></i>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // Função para atualizar lista de admins na UI
+    function atualizarListaAdmins() {
+        const container = document.getElementById('admins-lista');
+        if (!container) return;
+        
+        if (ADMIN_EMAILS.length === 0) {
+            container.innerHTML = '<p style="color:#94a3b8;">Nenhum administrador.</p>';
+            return;
+        }
+        
+        let html = '';
+        ADMIN_EMAILS.forEach(email => {
+            html += `
+                <div class="usuario-item" style="border-left-color: #27ae60;">
+                    <h4>${email}</h4>
+                    <div class="item-actions">
+                        <i class="fa-regular fa-trash-can" onclick="window.removerAdmin('${email}')"></i>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // Função para atualizar lista de contas bloqueadas na UI
+    function atualizarListaContasBloqueadas() {
+        const container = document.getElementById('contas-bloqueadas-lista');
+        if (!container) return;
+        
+        if (CONTAS_BLOQUEADAS.length === 0) {
+            container.innerHTML = '<p style="color:#94a3b8;">Nenhuma conta bloqueada.</p>';
+            return;
+        }
+        
+        let html = '';
+        CONTAS_BLOQUEADAS.forEach(email => {
+            html += `
+                <div class="usuario-item" style="border-left-color: #e74c3c;">
+                    <h4>${email}</h4>
+                    <div class="item-actions">
+                        <i class="fa-regular fa-trash-can" onclick="window.desbloquearConta('${email}')"></i>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // Função para carregar TODOS os usuários do sistema
+    async function carregarTodosUsuarios() {
+        const container = document.getElementById('usuarios-lista');
+        container.innerHTML = '<p style="color:#5f6b7a;">Carregando todos os usuários...</p>';
+        
+        try {
+            const usuariosMap = new Map(); // Usar email como chave para evitar duplicatas
+            
+            // 1. Buscar usuários que já enviaram mensagens no chat
+            const mensagensSnap = await getDocs(collection(db, "mensagens"));
+            mensagensSnap.forEach(doc => {
+                const msg = doc.data();
+                if (msg.autorId && msg.autorNome) {
+                    // Tentar obter email da mensagem se disponível
+                    const email = msg.autorEmail || `${msg.autorId.substring(0,8)}@usuario.firebase`;
+                    const key = email;
+                    
+                    if (!usuariosMap.has(key)) {
+                        usuariosMap.set(key, {
+                            id: msg.autorId,
+                            nome: msg.autorNome,
+                            email: email,
+                            foto: msg.autorFoto || 'https://via.placeholder.com/40',
+                            isAdmin: ADMIN_EMAILS.includes(email) || ADMIN_EMAILS.includes(msg.autorEmail),
+                            isBloqueado: CONTAS_BLOQUEADAS.includes(email) || CONTAS_BLOQUEADAS.includes(msg.autorEmail),
+                            uid: msg.autorId
+                        });
+                    }
+                }
+            });
+            
+            // 2. Buscar membros da gestão
+            const membrosSnap = await getDocs(collection(db, "membros"));
+            membrosSnap.forEach(doc => {
+                const membro = doc.data();
+                // Se o membro tiver um email, adicionar
+                if (membro.email) {
+                    const key = membro.email;
+                    if (!usuariosMap.has(key)) {
+                        usuariosMap.set(key, {
+                            id: doc.id,
+                            nome: membro.nome || 'Membro',
+                            email: membro.email,
+                            foto: membro.foto || 'https://via.placeholder.com/40',
+                            isAdmin: ADMIN_EMAILS.includes(membro.email),
+                            isBloqueado: CONTAS_BLOQUEADAS.includes(membro.email)
+                        });
+                    }
+                }
+            });
+            
+            // 3. Buscar usuários que criaram notificações
+            const notificacoesSnap = await getDocs(collection(db, "notificacoes"));
+            notificacoesSnap.forEach(doc => {
+                const notif = doc.data();
+                if (notif.criadoPor && notif.criadoPor.includes('@')) {
+                    const email = notif.criadoPor;
+                    const key = email;
+                    if (!usuariosMap.has(key)) {
+                        usuariosMap.set(key, {
+                            id: `notif_${email}`,
+                            nome: email.split('@')[0],
+                            email: email,
+                            foto: 'https://via.placeholder.com/40',
+                            isAdmin: ADMIN_EMAILS.includes(email),
+                            isBloqueado: CONTAS_BLOQUEADAS.includes(email)
+                        });
+                    }
+                }
+            });
+            
+            // 4. Buscar usuários que criaram eventos
+            const eventosSnap = await getDocs(collection(db, "eventos"));
+            eventosSnap.forEach(doc => {
+                const evento = doc.data();
+                if (evento.criadoPor && evento.criadoPor.includes('@')) {
+                    const email = evento.criadoPor;
+                    const key = email;
+                    if (!usuariosMap.has(key)) {
+                        usuariosMap.set(key, {
+                            id: `evento_${email}`,
+                            nome: email.split('@')[0],
+                            email: email,
+                            foto: 'https://via.placeholder.com/40',
+                            isAdmin: ADMIN_EMAILS.includes(email),
+                            isBloqueado: CONTAS_BLOQUEADAS.includes(email)
+                        });
+                    }
+                }
+            });
+            
+            // 5. ADICIONAR TODOS OS EMAILS DOS ADMINS
+            ADMIN_EMAILS.forEach(email => {
+                const key = email;
+                if (!usuariosMap.has(key)) {
+                    usuariosMap.set(key, {
+                        id: `admin_${email}`,
+                        nome: email.split('@')[0],
+                        email: email,
+                        foto: 'https://via.placeholder.com/40',
+                        isAdmin: true,
+                        isBloqueado: CONTAS_BLOQUEADAS.includes(email)
+                    });
+                } else {
+                    // Atualizar para garantir que é admin
+                    const usuario = usuariosMap.get(key);
+                    usuario.isAdmin = true;
+                    usuariosMap.set(key, usuario);
+                }
+            });
+            
+            // 6. ADICIONAR TODOS OS EMAILS DOS BLOQUEADOS
+            CONTAS_BLOQUEADAS.forEach(email => {
+                const key = email;
+                if (!usuariosMap.has(key)) {
+                    usuariosMap.set(key, {
+                        id: `bloqueado_${email}`,
+                        nome: email.split('@')[0],
+                        email: email,
+                        foto: 'https://via.placeholder.com/40',
+                        isAdmin: ADMIN_EMAILS.includes(email),
+                        isBloqueado: true
+                    });
+                } else {
+                    // Atualizar para garantir que está como bloqueado
+                    const usuario = usuariosMap.get(key);
+                    usuario.isBloqueado = true;
+                    usuariosMap.set(key, usuario);
+                }
+            });
+            
+            // Converter mapa para array
+            const usuariosArray = Array.from(usuariosMap.values());
+            
+            // Ordenar por nome
+            usuariosArray.sort((a, b) => a.nome.localeCompare(b.nome));
+            
+            if (usuariosArray.length === 0) {
+                container.innerHTML = '<p style="color:#94a3b8;">Nenhum usuário encontrado.</p>';
+                return;
+            }
+            
+            let html = '';
+            usuariosArray.forEach(usuario => {
+                html += `
+                    <div class="usuario-card">
+                        <img src="${usuario.foto}" alt="avatar" onerror="this.src='https://via.placeholder.com/40'">
+                        <div class="usuario-info">
+                            <strong>${usuario.nome}</strong>
+                            <small>${usuario.email}</small>
+                            ${usuario.isAdmin ? '<span style="color:#27ae60; font-size:0.8rem; margin-left:5px;">Admin</span>' : ''}
+                            ${usuario.isBloqueado ? '<span style="color:#e74c3c; font-size:0.8rem; margin-left:5px;">Bloqueado</span>' : ''}
+                        </div>
+                        ${!usuario.isBloqueado && !usuario.isAdmin ? `
+                            <div class="btn-icon-small" onclick="window.bloquearUsuario('${usuario.email}', '${usuario.nome}')" title="Bloquear conta">
+                                <i class="fa-solid fa-ban"></i>
+                            </div>
+                        ` : ''}
+                        ${usuario.isBloqueado ? `
+                            <div class="btn-icon-small" onclick="window.desbloquearConta('${usuario.email}')" title="Desbloquear conta" style="color:#27ae60;">
+                                <i class="fa-solid fa-lock-open"></i>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            // Adicionar instrução
+            html += `
+                <div style="margin-top:20px; padding:15px; background:#f0f4fa; border-radius:20px; font-size:0.9rem; color:#4a5a72;">
+                    <i class="fa-solid fa-info-circle"></i> 
+                    Mostrando todos os usuários encontrados no sistema (${usuariosArray.length} usuários).
+                    Para bloquear uma conta, clique no ícone <i class="fa-solid fa-ban" style="color:#e74c3c;"></i>.
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        } catch (e) {
+            console.error("Erro ao carregar todos os usuários:", e);
+            container.innerHTML = '<p style="color:#e74c3c;">Erro ao carregar usuários. Tente novamente.</p>';
+        }
+    }
+
+    // Funções globais para ações de moderação
+    window.removerPalavraBloqueada = async (palavra) => {
+        try {
+            const palavrasRef = collection(db, "configuracoes", "chat", "palavrasBloqueadas");
+            const q = query(palavrasRef, where("palavra", "==", palavra));
+            const snapshot = await getDocs(q);
+            
+            const batch = writeBatch(db);
+            snapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            
+            PALAVRAS_BLOQUEADAS = PALAVRAS_BLOQUEADAS.filter(p => p !== palavra);
+            atualizarListaPalavrasBloqueadas();
+            mostrarConfirmacao("Sucesso", "Palavra removida da lista de bloqueio!");
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao remover palavra.");
+        }
+    };
+
+    window.removerAdmin = async (email) => {
+        try {
+            ADMIN_EMAILS = ADMIN_EMAILS.filter(e => e !== email);
+            await setDoc(doc(db, "configuracoes", "admins"), { emails: ADMIN_EMAILS });
+            atualizarListaAdmins();
+            mostrarConfirmacao("Sucesso", "Administrador removido!");
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao remover admin.");
+        }
+    };
+
+    window.desbloquearConta = async (email) => {
+        try {
+            const bloqueadosRef = collection(db, "configuracoes", "acesso", "bloqueados");
+            const q = query(bloqueadosRef, where("email", "==", email));
+            const snapshot = await getDocs(q);
+            
+            const batch = writeBatch(db);
+            snapshot.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+            
+            CONTAS_BLOQUEADAS = CONTAS_BLOQUEADAS.filter(e => e !== email);
+            atualizarListaContasBloqueadas();
+            
+            // Atualizar a lista de usuários se estiver visível
+            if (document.getElementById('campo-bloquear-conta').style.display === 'block') {
+                carregarTodosUsuarios();
+            }
+            
+            mostrarConfirmacao("Sucesso", `Conta ${email} desbloqueada!`);
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao desbloquear conta.");
+        }
+    };
+
+    window.bloquearUsuario = async (email, nome) => {
+        if (!email || !email.includes('@')) {
+            mostrarConfirmacao("Erro", "Email inválido para bloqueio.");
+            return;
+        }
+        
+        try {
+            // Verificar se já está bloqueado
+            if (CONTAS_BLOQUEADAS.includes(email)) {
+                mostrarConfirmacao("Aviso", "Esta conta já está bloqueada.");
+                return;
+            }
+            
+            // Verificar se é admin
+            if (ADMIN_EMAILS.includes(email)) {
+                mostrarConfirmacao("Aviso", "Administradores não podem ser bloqueados.");
+                return;
+            }
+            
+            await addDoc(collection(db, "configuracoes", "acesso", "bloqueados"), {
+                email,
+                nome,
+                bloqueadoPor: auth.currentUser?.email,
+                data: Timestamp.now()
+            });
+            
+            CONTAS_BLOQUEADAS.push(email);
+            atualizarListaContasBloqueadas();
+            
+            // Atualizar a lista de usuários se estiver visível
+            if (document.getElementById('campo-bloquear-conta').style.display === 'block') {
+                carregarTodosUsuarios();
+            }
+            
+            mostrarConfirmacao("Sucesso", `Usuário ${nome} (${email}) bloqueado com sucesso!`);
+        } catch (e) {
+            console.error("Erro ao bloquear usuário:", e);
+            mostrarConfirmacao("Erro", "Falha ao bloquear usuário. Verifique o console para mais detalhes.");
+        }
+    };
+
+    // Função para verificar palavras bloqueadas
+    function verificarPalavrasBloqueadas(texto) {
+        const textoLower = texto.toLowerCase();
+        return PALAVRAS_BLOQUEADAS.some(palavra => textoLower.includes(palavra));
+    }
+
+    // Função para registrar visualização de mensagem
+    async function registrarVisualizacao(mensagemId, usuarioId, usuarioNome, usuarioFoto) {
+        try {
+            const visualizacaoRef = doc(db, "mensagens", mensagemId, "visualizacoes", usuarioId);
+            await setDoc(visualizacaoRef, {
+                usuarioId,
+                usuarioNome,
+                usuarioFoto,
+                timestamp: Timestamp.now()
+            }, { merge: true });
+        } catch (e) {
+            console.error("Erro ao registrar visualização:", e);
+        }
+    }
+
+    // Função para upload de imagem
+    async function uploadImagem(file) {
+        const storageRef = ref(storage, `chat/${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file);
+        return await getDownloadURL(storageRef);
+    }
+
+    // Função para remover imagem selecionada
+    window.removerImagem = function() {
+        imagemSelecionada = null;
+        imagePreview.style.display = 'none';
+        previewImg.src = '';
+        imageUpload.value = '';
+    };
+
+    // Evento de seleção de imagem
+    imageUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            imagemSelecionada = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Função para enviar mensagem
+    async function enviarMensagem() {
+        const texto = chatInput.value.trim();
+        if (!texto && !imagemSelecionada) return;
+
+        const user = auth.currentUser;
+        if (!user) return;
+
+        if (texto && verificarPalavrasBloqueadas(texto)) {
+            mostrarConfirmacao("Mensagem bloqueada", "Sua mensagem contém palavras inapropriadas e não foi enviada.");
+            chatInput.value = '';
+            return;
+        }
+
+        try {
+            let imageUrl = null;
+            if (imagemSelecionada) {
+                imageUrl = await uploadImagem(imagemSelecionada);
+            }
+
+            const mensagemData = {
+                texto: texto || '',
+                autorId: user.uid,
+                autorNome: user.displayName || 'Usuário',
+                autorFoto: user.photoURL || 'https://via.placeholder.com/24',
+                autorEmail: user.email || '',
+                timestamp: Timestamp.now(),
+                imagemUrl: imageUrl
+            };
+
+            if (mensagemParaResponder) {
+                mensagemData.respostaPara = {
+                    id: mensagemParaResponder.id,
+                    texto: mensagemParaResponder.texto,
+                    autorNome: mensagemParaResponder.autorNome,
+                    imagemUrl: mensagemParaResponder.imagemUrl
+                };
+                mensagemParaResponder = null;
+                chatInput.placeholder = 'Digite sua mensagem...';
+            }
+
+            await addDoc(collection(db, "mensagens"), mensagemData);
+            
+            chatInput.value = '';
+            removerImagem();
+            
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Não foi possível enviar a mensagem.");
+        }
+    }
+
+    // Função para carregar mensagens em tempo real
+    function carregarMensagensTempoReal() {
+        const q = query(collection(db, "mensagens"), orderBy("timestamp", "asc"));
+
+        onSnapshot(q, async (snapshot) => {
+            if (snapshot.empty) {
+                chatMessages.innerHTML = '<p style="color:#94a3b8; text-align:center; margin-top:40px;">Nenhuma mensagem ainda. Seja o primeiro a enviar!</p>';
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (user) {
+                snapshot.forEach(doc => {
+                    if (doc.data().autorId !== user.uid) {
+                        registrarVisualizacao(doc.id, user.uid, user.displayName || 'Usuário', user.photoURL || 'https://via.placeholder.com/24');
+                    }
+                });
+            }
+
+            let html = '';
+            for (const doc of snapshot.docs) {
+                const msg = doc.data();
+                const isOwnMessage = msg.autorId === auth.currentUser?.uid;
+                const isAdmin = ADMIN_EMAILS.includes(auth.currentUser?.email);
+                
+                const data = msg.timestamp?.toDate ? msg.timestamp.toDate() : new Date();
+                const hora = data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const dataFormatada = data.toLocaleDateString();
+
+                let visualizacoesHtml = '';
+                try {
+                    const visualizacoesSnap = await getDocs(collection(db, "mensagens", doc.id, "visualizacoes"));
+                    if (!visualizacoesSnap.empty) {
+                        const visualizacoes = [];
+                        visualizacoesSnap.forEach(v => {
+                            const vis = v.data();
+                            visualizacoes.push(vis);
+                        });
+                        
+                        if (visualizacoes.length > 0) {
+                            visualizacoesHtml = `
+                                <div class="message-views">
+                                    <div class="viewers-avatars">
+                                        ${visualizacoes.slice(0, 3).map(v => `
+                                            <img src="${v.usuarioFoto || 'https://via.placeholder.com/20'}" class="viewer-avatar" title="${v.usuarioNome}" onerror="this.src='https://via.placeholder.com/20'">
+                                        `).join('')}
+                                    </div>
+                                    <span>${visualizacoes.length} ${visualizacoes.length === 1 ? 'visualização' : 'visualizações'}</span>
+                                </div>
+                            `;
+                        }
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar visualizações:", e);
+                }
+
+                const textoEscapado = msg.texto ? msg.texto.replace(/'/g, "\\'") : '';
+                const autorNomeEscapado = msg.autorNome ? msg.autorNome.replace(/'/g, "\\'") : '';
+
+                html += `
+                    <div class="message-wrapper ${isOwnMessage ? 'own-message' : ''}" data-id="${doc.id}">
+                        <div class="message-bubble">
+                            ${msg.respostaPara ? `
+                                <div class="message-reply">
+                                    <div class="reply-author">${msg.respostaPara.autorNome}</div>
+                                    <div class="reply-content">${msg.respostaPara.texto || '📷 Imagem'}</div>
+                                </div>
+                            ` : ''}
+                            
+                            <div class="message-header">
+                                <img src="${msg.autorFoto || 'https://via.placeholder.com/24'}" class="message-author-avatar" alt="avatar" onerror="this.src='https://via.placeholder.com/24'">
+                                <span class="message-author">${isOwnMessage ? 'Você' : msg.autorNome}</span>
+                                <span class="message-time">${hora} - ${dataFormatada}</span>
+                            </div>
+                            
+                            ${msg.texto ? `<div class="message-content">${msg.texto}</div>` : ''}
+                            
+                            ${msg.imagemUrl ? `<img src="${msg.imagemUrl}" class="message-image" onclick="window.open(this.src, '_blank')">` : ''}
+                            
+                            ${visualizacoesHtml}
+                            
+                            <div class="message-actions">
+                                <i class="fa-regular fa-reply" onclick="window.responderMensagem('${doc.id}', '${textoEscapado || ''}', '${autorNomeEscapado}')" title="Responder"></i>
+                                ${isOwnMessage ? `
+                                    <i class="fa-regular fa-pen-to-square" onclick="window.editarMensagem('${doc.id}', '${textoEscapado || ''}')" title="Editar"></i>
+                                    <i class="fa-regular fa-trash-can" onclick="window.excluirMensagem('${doc.id}')" title="Excluir"></i>
+                                ` : isAdmin ? `
+                                    <i class="fa-regular fa-trash-can" onclick="window.excluirMensagem('${doc.id}')" title="Excluir (Admin)"></i>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            chatMessages.innerHTML = html;
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, (error) => {
+            console.error("Erro no snapshot de mensagens:", error);
+            chatMessages.innerHTML = '<p>Erro ao carregar mensagens.</p>';
+        });
+    }
+
+    window.responderMensagem = function(id, texto, autorNome) {
+        mensagemParaResponder = {
+            id,
+            texto: texto || '📷 Imagem',
+            autorNome
+        };
+        chatInput.focus();
+        chatInput.placeholder = `Respondendo para ${autorNome}...`;
+    };
+
+    window.editarMensagem = function(id, texto) {
+        document.getElementById('editar-mensagem-id').value = id;
+        document.getElementById('editar-mensagem-conteudo').value = texto;
+        showModal(modalEditarMensagem);
+    };
+
+    salvarEditarMensagem.addEventListener('click', async () => {
+        const id = document.getElementById('editar-mensagem-id').value;
+        const novoTexto = document.getElementById('editar-mensagem-conteudo').value.trim();
+        
+        if (!novoTexto) {
+            mostrarConfirmacao("Campo vazio", "Digite o texto da mensagem.");
+            return;
+        }
+
+        if (verificarPalavrasBloqueadas(novoTexto)) {
+            mostrarConfirmacao("Mensagem bloqueada", "Sua mensagem contém palavras inapropriadas.");
+            return;
+        }
+
+        try {
+            await updateDoc(doc(db, "mensagens", id), {
+                texto: novoTexto,
+                editado: true
+            });
+            mostrarConfirmacao("Sucesso", "Mensagem editada com sucesso!");
+            hideModal(modalEditarMensagem);
+        } catch (e) {
+            console.error(e);
+            mostrarConfirmacao("Erro", "Falha ao editar mensagem.");
+        }
+    });
+
+    window.excluirMensagem = function(id) {
+        itemParaExcluir = { tipo: 'mensagem', id };
+        document.getElementById('excluir-mensagem').innerText = 'Tem certeza que deseja excluir esta mensagem?';
+        showModal(modalConfirmarExcluir);
+    };
+
+    chatInput.addEventListener('input', () => {
+        if (!auth.currentUser) return;
+        
+        if (typingTimeout) clearTimeout(typingTimeout);
+        
+        const typingRef = collection(db, "typing");
+        addDoc(typingRef, {
+            usuario: auth.currentUser.displayName || 'Usuário',
+            usuarioId: auth.currentUser.uid,
+            timestamp: Timestamp.now()
+        }).catch(() => {});
+
+        typingTimeout = setTimeout(() => {}, 3000);
+    });
+
+    function monitorarDigitacao() {
+        const q = query(collection(db, "typing"), orderBy("timestamp", "desc"));
+        
+        onSnapshot(q, (snapshot) => {
+            const now = Timestamp.now();
+            const usersTyping = new Set();
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const diff = now.seconds - data.timestamp.seconds;
+                if (diff < 3 && data.usuarioId !== auth.currentUser?.uid) {
+                    usersTyping.add(data.usuario);
+                }
+            });
+
+            if (usersTyping.size > 0) {
+                typingUser.textContent = Array.from(usersTyping).join(', ');
+                typingIndicator.classList.add('active');
+            } else {
+                typingIndicator.classList.remove('active');
+            }
+        });
+    }
+
+    sendMessageBtn.addEventListener('click', enviarMensagem);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            enviarMensagem();
+        }
+    });
+
+    const radiosTipoData = document.querySelectorAll('input[name="tipoData"]');
+    const campoDataEspecifica = document.getElementById('campo-data-especifica');
+    const campoDiaSemana = document.getElementById('campo-dia-semana');
+
+    radiosTipoData.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'especifica') {
+                campoDataEspecifica.style.display = 'block';
+                campoDiaSemana.style.display = 'none';
+            } else {
+                campoDataEspecifica.style.display = 'none';
+                campoDiaSemana.style.display = 'block';
+            }
+        });
+    });
+
+    const editarRadiosTipoData = document.querySelectorAll('input[name="editarTipoData"]');
+    const editarCampoDataEspecifica = document.getElementById('editar-campo-data-especifica');
+    const editarCampoDiaSemana = document.getElementById('editar-campo-dia-semana');
+
+    editarRadiosTipoData.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'especifica') {
+                editarCampoDataEspecifica.style.display = 'block';
+                editarCampoDiaSemana.style.display = 'none';
+            } else {
+                editarCampoDataEspecifica.style.display = 'none';
+                editarCampoDiaSemana.style.display = 'block';
+            }
+        });
+    });
+
+    btnLogin.addEventListener('click', async () => {
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            console.error(error);
+            mostrarConfirmacao("Erro no login", "Não foi possível entrar com Google.");
+        }
+    });
+
+    navSair.addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+            mostrarConfirmacao("Até logo!", "Você saiu da sua conta.");
+        } catch (error) {
+            console.error(error);
+            mostrarConfirmacao("Erro", "Não foi possível sair da conta.");
+        }
+    });
+
+    function isAdmin(user) {
+        return user && ADMIN_EMAILS.includes(user.email);
+    }
+
+    function verificarContaBloqueada(email) {
+        return CONTAS_BLOQUEADAS.includes(email);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            await carregarConfiguracoes();
+            
+            if (verificarContaBloqueada(user.email)) {
+                mostrarConfirmacao("Acesso bloqueado", "Sua conta foi bloqueada por um administrador. Entre em contato com o grêmio estudantil.");
+                await signOut(auth);
+                return;
+            }
+            
+            loginScreen.style.opacity = '0';
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                appScreen.style.display = 'flex';
+                setTimeout(() => appScreen.style.opacity = '1', 50);
+            }, 300);
+
+            userFoto.src = user.photoURL || 'https://via.placeholder.com/48';
+            userNome.innerText = user.displayName || 'Usuário';
+
+            const admin = isAdmin(user);
+            if (admin) {
+                navPlus.style.display = 'flex';
+                navAcesso.style.display = 'flex';
+                btnNovoEvento.style.display = 'inline-flex';
+                document.getElementById('btn-registrar-cargo').style.display = 'inline-flex';
+                document.getElementById('gestao').classList.add('admin');
+            } else {
+                navPlus.style.display = 'none';
+                navAcesso.style.display = 'none';
+                btnNovoEvento.style.display = 'none';
+                document.getElementById('btn-registrar-cargo').style.display = 'none';
+                document.getElementById('gestao').classList.remove('admin');
+            }
+
+            await migrarMembrosSeNecessario();
+
+            carregarBadgeNotificacoes(user.uid);
+            carregarEventosTempoReal();
+            carregarMembrosTempoReal();
+            carregarMensagensTempoReal();
+            monitorarDigitacao();
+
+            if (document.getElementById('admin').classList.contains('active') && admin) {
+                carregarNotificacoesAdmin();
+            }
+        } else {
+            loginScreen.style.display = 'flex';
+            loginScreen.style.opacity = '1';
+            appScreen.style.display = 'none';
+        }
+    });
+
+    async function migrarMembrosSeNecessario() {
+        if (migracaoRealizada) return;
+        
+        try {
+            const membrosRef = collection(db, "membros");
+            const snapshot = await getDocs(membrosRef);
+            
+            if (snapshot.empty) return;
+            
+            const batch = writeBatch(db);
+            let precisaMigrar = false;
+            let index = 0;
+            
+            snapshot.forEach(doc => {
+                const dados = doc.data();
+                if (dados.ordem === undefined) {
+                    precisaMigrar = true;
+                    batch.update(doc.ref, { ordem: index });
+                }
+                index++;
+            });
+            
+            if (precisaMigrar) {
+                await batch.commit();
+                console.log("Migração de membros concluída!");
+            }
+            
+            migracaoRealizada = true;
+        } catch (e) {
+            console.error("Erro na migração:", e);
+        }
+    }
+
     function showModal(modal) { modal.classList.add('active'); }
     function hideModal(modal) { modal.classList.remove('active'); }
 
@@ -1051,6 +2501,10 @@
     cancelarCargo.addEventListener('click', () => hideModal(modalRegistrarCargo));
     closeEditarCargo.addEventListener('click', () => hideModal(modalEditarCargo));
     cancelarEditarCargo.addEventListener('click', () => hideModal(modalEditarCargo));
+    closeEditarMensagem.addEventListener('click', () => hideModal(modalEditarMensagem));
+    cancelarEditarMensagem.addEventListener('click', () => hideModal(modalEditarMensagem));
+    closeAcao.addEventListener('click', () => hideModal(modalRegistrarAcao));
+    cancelarAcao.addEventListener('click', () => hideModal(modalRegistrarAcao));
 
     function mostrarConfirmacao(titulo, mensagem) {
         document.getElementById('modal-titulo').innerText = titulo;
@@ -1058,107 +2512,6 @@
         showModal(modalConfirm);
     }
 
-    // Lógica para alternar entre data específica e dia da semana (criar)
-    const radiosTipoData = document.querySelectorAll('input[name="tipoData"]');
-    const campoDataEspecifica = document.getElementById('campo-data-especifica');
-    const campoDiaSemana = document.getElementById('campo-dia-semana');
-
-    radiosTipoData.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            if (e.target.value === 'especifica') {
-                campoDataEspecifica.style.display = 'block';
-                campoDiaSemana.style.display = 'none';
-            } else {
-                campoDataEspecifica.style.display = 'none';
-                campoDiaSemana.style.display = 'block';
-            }
-        });
-    });
-
-    // Lógica para alternar entre data específica e dia da semana (editar)
-    const editarRadiosTipoData = document.querySelectorAll('input[name="editarTipoData"]');
-    const editarCampoDataEspecifica = document.getElementById('editar-campo-data-especifica');
-    const editarCampoDiaSemana = document.getElementById('editar-campo-dia-semana');
-
-    editarRadiosTipoData.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            if (e.target.value === 'especifica') {
-                editarCampoDataEspecifica.style.display = 'block';
-                editarCampoDiaSemana.style.display = 'none';
-            } else {
-                editarCampoDataEspecifica.style.display = 'none';
-                editarCampoDiaSemana.style.display = 'block';
-            }
-        });
-    });
-
-    // Login
-    btnLogin.addEventListener('click', async () => {
-        try {
-            await signInWithPopup(auth, provider);
-        } catch (error) {
-            console.error(error);
-            mostrarConfirmacao("Erro no login", "Não foi possível entrar com Google.");
-        }
-    });
-
-    // Logout
-    navSair.addEventListener('click', async () => {
-        try {
-            await signOut(auth);
-            mostrarConfirmacao("Até logo!", "Você saiu da sua conta.");
-        } catch (error) {
-            console.error(error);
-            mostrarConfirmacao("Erro", "Não foi possível sair da conta.");
-        }
-    });
-
-    function isAdmin(user) {
-        return user && ADMIN_EMAILS.includes(user.email);
-    }
-
-    // Monitorar autenticação
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            loginScreen.style.opacity = '0';
-            setTimeout(() => {
-                loginScreen.style.display = 'none';
-                appScreen.style.display = 'flex';
-                setTimeout(() => appScreen.style.opacity = '1', 50);
-            }, 300);
-
-            userFoto.src = user.photoURL || 'https://via.placeholder.com/48';
-            userNome.innerText = user.displayName || 'Usuário';
-
-            const admin = isAdmin(user);
-            if (admin) {
-                navPlus.style.display = 'flex';
-                btnNovoEvento.style.display = 'inline-flex';
-                document.getElementById('btn-registrar-cargo').style.display = 'inline-flex';
-            } else {
-                navPlus.style.display = 'none';
-                btnNovoEvento.style.display = 'none';
-                document.getElementById('btn-registrar-cargo').style.display = 'none';
-            }
-
-            // Inicia snapshot das notificações para o badge
-            carregarBadgeNotificacoes(user.uid);
-            // Inicia snapshot dos eventos (tempo real)
-            carregarEventosTempoReal();
-            // Inicia snapshot dos membros da gestão
-            carregarMembrosTempoReal();
-
-            if (document.getElementById('admin').classList.contains('active') && admin) {
-                carregarNotificacoesAdmin();
-            }
-        } else {
-            loginScreen.style.display = 'flex';
-            loginScreen.style.opacity = '1';
-            appScreen.style.display = 'none';
-        }
-    });
-
-    // Badge de notificações não lidas
     function carregarBadgeNotificacoes(uid) {
         const q = query(collection(db, "notificacoes"), orderBy("data", "desc"));
         onSnapshot(q, (snapshot) => {
@@ -1178,7 +2531,6 @@
         });
     }
 
-    // CARREGAR EVENTOS EM TEMPO REAL
     function carregarEventosTempoReal() {
         const container = document.getElementById('eventos-lista');
         const q = query(collection(db, "eventos"), orderBy("createdAt", "desc"));
@@ -1221,8 +2573,8 @@
                         <small><i class="fa-regular fa-calendar"></i> ${dataStr}</small>
                         ${admin ? `
                         <div class="item-actions">
-                            <i class="fa-regular fa-pen-to-square" onclick="editarEvento('${doc.id}')"></i>
-                            <i class="fa-regular fa-trash-can" onclick="excluirEvento('${doc.id}')"></i>
+                            <i class="fa-regular fa-pen-to-square" onclick="window.editarEvento('${doc.id}')"></i>
+                            <i class="fa-regular fa-trash-can" onclick="window.excluirEvento('${doc.id}')"></i>
                         </div>
                         ` : ''}
                     </div>
@@ -1235,10 +2587,77 @@
         });
     }
 
-    // CARREGAR MEMBROS DA GESTÃO EM TEMPO REAL
+    function iniciarDrag(e, id) {
+        if (!isAdmin(auth.currentUser)) return;
+        
+        dragSourceId = id;
+        e.dataTransfer.setData('text/plain', id);
+        e.target.classList.add('dragging');
+    }
+
+    function finalizarDrag(e) {
+        e.target.classList.remove('dragging');
+    }
+
+    function permitirDrop(e) {
+        e.preventDefault();
+        if (!isAdmin(auth.currentUser)) return;
+        const target = e.target.closest('.membro-item');
+        if (target) target.classList.add('drag-over');
+    }
+
+    function sairDrop(e) {
+        const target = e.target.closest('.membro-item');
+        if (target) target.classList.remove('drag-over');
+    }
+
+    async function realizarDrop(e, targetId) {
+        e.preventDefault();
+        sairDrop(e);
+        
+        if (!isAdmin(auth.currentUser) || !dragSourceId || dragSourceId === targetId) {
+            dragSourceId = null;
+            return;
+        }
+
+        const sourceIndex = membrosOrdenados.findIndex(m => m.id === dragSourceId);
+        const targetIndex = membrosOrdenados.findIndex(m => m.id === targetId);
+        
+        if (sourceIndex === -1 || targetIndex === -1) {
+            dragSourceId = null;
+            return;
+        }
+
+        const [movedItem] = membrosOrdenados.splice(sourceIndex, 1);
+        membrosOrdenados.splice(targetIndex, 0, movedItem);
+
+        try {
+            const batch = writeBatch(db);
+            
+            membrosOrdenados.forEach((membro, index) => {
+                const membroRef = doc(db, "membros", membro.id);
+                batch.update(membroRef, { ordem: index });
+            });
+            
+            await batch.commit();
+            mostrarConfirmacao("Sucesso", "Ordem dos membros atualizada!");
+        } catch (e) {
+            console.error("Erro ao reordenar membros:", e);
+            mostrarConfirmacao("Erro", "Não foi possível reordenar os membros.");
+        }
+        
+        dragSourceId = null;
+    }
+
     function carregarMembrosTempoReal() {
         const container = document.getElementById('membros-lista');
-        const q = query(collection(db, "membros"), orderBy("nome", "asc"));
+        
+        let q;
+        try {
+            q = query(collection(db, "membros"), orderBy("ordem", "asc"));
+        } catch (e) {
+            q = query(collection(db, "membros"), orderBy("nome", "asc"));
+        }
 
         onSnapshot(q, (snapshot) => {
             if (snapshot.empty) {
@@ -1246,14 +2665,28 @@
                 return;
             }
 
+            membrosOrdenados = [];
+            
             let html = '';
             snapshot.forEach(doc => {
                 const membro = doc.data();
                 const admin = isAdmin(auth.currentUser);
                 const cor = membro.cor || '#8e44ad';
+                
+                const ordem = membro.ordem !== undefined ? membro.ordem : membrosOrdenados.length;
+                membrosOrdenados.push({ id: doc.id, ordem, ...membro });
 
                 html += `
-                    <div class="membro-item" data-id="${doc.id}" style="border-left-color: ${cor};">
+                    <div class="membro-item" 
+                         data-id="${doc.id}" 
+                         style="border-left-color: ${cor};"
+                         draggable="${admin}"
+                         ondragstart="window.iniciarDrag(event, '${doc.id}')"
+                         ondragend="window.finalizarDrag(event)"
+                         ondragover="window.permitirDrop(event)"
+                         ondragleave="window.sairDrop(event)"
+                         ondrop="window.realizarDrop(event, '${doc.id}')">
+                        ${admin ? '<i class="fa-solid fa-grip-vertical drag-handle" title="Arraste para reordenar"></i>' : ''}
                         <h4>${membro.nome || 'Nome não informado'}</h4>
                         <p><i class="fa-regular fa-clock"></i> Turno: ${membro.turno || 'Não informado'}</p>
                         <p><i class="fa-regular fa-book"></i> Série: ${membro.serie || 'Não informado'}</p>
@@ -1262,8 +2695,8 @@
                         </div>
                         ${admin ? `
                         <div class="item-actions">
-                            <i class="fa-regular fa-pen-to-square" onclick="editarMembro('${doc.id}')"></i>
-                            <i class="fa-regular fa-trash-can" onclick="excluirMembro('${doc.id}')"></i>
+                            <i class="fa-regular fa-pen-to-square" onclick="window.editarMembro('${doc.id}')"></i>
+                            <i class="fa-regular fa-trash-can" onclick="window.excluirMembro('${doc.id}')"></i>
                         </div>
                         ` : ''}
                     </div>
@@ -1272,11 +2705,57 @@
             container.innerHTML = html;
         }, (error) => {
             console.error("Erro no snapshot de membros:", error);
-            container.innerHTML = '<p>Erro ao carregar membros da gestão.</p>';
+            const q2 = query(collection(db, "membros"), orderBy("nome", "asc"));
+            onSnapshot(q2, (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="color:#94a3b8;">Nenhum membro cadastrado na gestão.</p>';
+                    return;
+                }
+
+                membrosOrdenados = [];
+                
+                let html = '';
+                snapshot.forEach(doc => {
+                    const membro = doc.data();
+                    const admin = isAdmin(auth.currentUser);
+                    const cor = membro.cor || '#8e44ad';
+                    
+                    membrosOrdenados.push({ id: doc.id, ...membro });
+
+                    html += `
+                        <div class="membro-item" 
+                             data-id="${doc.id}" 
+                             style="border-left-color: ${cor};"
+                             draggable="${admin}"
+                             ondragstart="window.iniciarDrag(event, '${doc.id}')"
+                             ondragend="window.finalizarDrag(event)"
+                             ondragover="window.permitirDrop(event)"
+                             ondragleave="window.sairDrop(event)"
+                             ondrop="window.realizarDrop(event, '${doc.id}')">
+                            ${admin ? '<i class="fa-solid fa-grip-vertical drag-handle" title="Arraste para reordenar"></i>' : ''}
+                            <h4>${membro.nome || 'Nome não informado'}</h4>
+                            <p><i class="fa-regular fa-clock"></i> Turno: ${membro.turno || 'Não informado'}</p>
+                            <p><i class="fa-regular fa-book"></i> Série: ${membro.serie || 'Não informado'}</p>
+                            <div class="cargo-badge" style="background-color: ${cor};"> 
+                                <i class="fa-solid fa-shield-halved"></i> ${membro.descricao || 'Membro'}
+                            </div>
+                            ${admin ? `
+                            <div class="item-actions">
+                                <i class="fa-regular fa-pen-to-square" onclick="window.editarMembro('${doc.id}')"></i>
+                                <i class="fa-regular fa-trash-can" onclick="window.excluirMembro('${doc.id}')"></i>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }, (error2) => {
+                console.error("Erro no segundo snapshot de membros:", error2);
+                container.innerHTML = '<p style="color:#e74c3c;">Erro ao carregar membros da gestão. Verifique sua conexão.</p>';
+            });
         });
     }
 
-    // Carregar notificações no modal do sino
     async function carregarNotificacoesModal() {
         const listaDiv = document.getElementById('notificacoes-lista');
         try {
@@ -1297,7 +2776,7 @@
                             <p>${data.corpo || ''}</p>
                             <small>${dataStr}</small>
                             <div class="item-actions">
-                                ${!lida ? `<i class="fa-regular fa-check-circle" onclick="marcarComoLida('${doc.id}')" title="Marcar como lida"></i>` : ''}
+                                ${!lida ? `<i class="fa-regular fa-check-circle" onclick="window.marcarComoLida('${doc.id}')" title="Marcar como lida"></i>` : ''}
                             </div>
                         </div>
                     `;
@@ -1311,7 +2790,6 @@
         }
     }
 
-    // Marcar notificação como lida
     window.marcarComoLida = async (id) => {
         const uid = auth.currentUser?.uid;
         if (!uid) return;
@@ -1327,10 +2805,8 @@
         }
     };
 
-    // Abrir modal de notificações
     document.getElementById('btn-sino').addEventListener('click', carregarNotificacoesModal);
 
-    // Criar notificação
     document.getElementById('btn-nova-notificacao')?.addEventListener('click', () => {
         showModal(modalCriarNotif);
     });
@@ -1365,7 +2841,6 @@
         }
     });
 
-    // Criar evento
     btnNovoEvento.addEventListener('click', () => {
         document.getElementById('evento-titulo').value = '';
         document.getElementById('evento-descricao').value = '';
@@ -1420,7 +2895,6 @@
         }
     });
 
-    // Registrar cargo
     document.getElementById('btn-registrar-cargo').addEventListener('click', () => {
         document.getElementById('cargo-nome').value = '';
         document.getElementById('cargo-turno').value = '';
@@ -1444,12 +2918,16 @@
         }
 
         try {
+            const ordemSnapshot = await getDocs(query(collection(db, "membros"), orderBy("ordem", "desc")));
+            const novaOrdem = ordemSnapshot.empty ? 0 : (ordemSnapshot.docs[0].data().ordem || 0) + 1;
+
             await addDoc(collection(db, "membros"), {
                 nome,
                 turno,
                 serie,
                 descricao,
                 cor: cor,
+                ordem: novaOrdem,
                 criadoPor: auth.currentUser?.email || 'admin',
                 createdAt: new Date()
             });
@@ -1457,11 +2935,25 @@
             hideModal(modalRegistrarCargo);
         } catch (e) {
             console.error(e);
-            mostrarConfirmacao("Erro", "Falha ao registrar membro.");
+            try {
+                await addDoc(collection(db, "membros"), {
+                    nome,
+                    turno,
+                    serie,
+                    descricao,
+                    cor: cor,
+                    criadoPor: auth.currentUser?.email || 'admin',
+                    createdAt: new Date()
+                });
+                mostrarConfirmacao("Sucesso", "Membro registrado com sucesso!");
+                hideModal(modalRegistrarCargo);
+            } catch (e2) {
+                console.error(e2);
+                mostrarConfirmacao("Erro", "Falha ao registrar membro.");
+            }
         }
     });
 
-    // Editar membro
     window.editarMembro = async (id) => {
         try {
             const docRef = doc(db, "membros", id);
@@ -1513,14 +3005,12 @@
         }
     });
 
-    // Excluir membro
     window.excluirMembro = (id) => {
         itemParaExcluir = { tipo: 'membro', id };
         document.getElementById('excluir-mensagem').innerText = 'Tem certeza que deseja excluir este membro da gestão?';
         showModal(modalConfirmarExcluir);
     };
 
-    // Carregar notificações na aba admin
     async function carregarNotificacoesAdmin() {
         const container = document.getElementById('admin-notificacoes-lista');
         try {
@@ -1538,19 +3028,19 @@
                     <div style="background:white; border-radius:20px; padding:15px; margin:10px 0; position:relative;">
                         <strong>${data.titulo}</strong> <br> ${data.corpo} <br><small>${dataStr}</small>
                         <div class="item-actions">
-                            <i class="fa-regular fa-pen-to-square" onclick="editarNotificacao('${d.id}')"></i>
-                            <i class="fa-regular fa-trash-can" onclick="excluirNotificacao('${d.id}')"></i>
+                            <i class="fa-regular fa-pen-to-square" onclick="window.editarNotificacao('${d.id}')"></i>
+                            <i class="fa-regular fa-trash-can" onclick="window.excluirNotificacao('${d.id}')"></i>
                         </div>
                     </div>
                 `;
             });
             container.innerHTML = html;
         } catch (e) {
+            console.error(e);
             container.innerHTML = '<p>Erro ao carregar.</p>';
         }
     }
 
-    // Editar notificação
     window.editarNotificacao = async (id) => {
         try {
             const docRef = doc(db, "notificacoes", id);
@@ -1568,7 +3058,6 @@
         }
     };
 
-    // Editar evento
     window.editarEvento = async (id) => {
         try {
             const docRef = doc(db, "eventos", id);
@@ -1606,7 +3095,6 @@
         }
     };
 
-    // Salvar edição de notificação
     document.getElementById('salvar-editar-notif').addEventListener('click', async () => {
         const id = document.getElementById('editar-notif-id').value;
         const titulo = document.getElementById('editar-notif-titulo').value.trim();
@@ -1629,7 +3117,6 @@
         }
     });
 
-    // Salvar edição de evento
     document.getElementById('salvar-editar-evento').addEventListener('click', async () => {
         const id = document.getElementById('editar-evento-id').value;
         const titulo = document.getElementById('editar-evento-titulo').value.trim();
@@ -1673,14 +3160,12 @@
         }
     });
 
-    // Excluir notificação
     window.excluirNotificacao = (id) => {
         itemParaExcluir = { tipo: 'notificacao', id };
         document.getElementById('excluir-mensagem').innerText = 'Tem certeza que deseja excluir esta notificação?';
         showModal(modalConfirmarExcluir);
     };
 
-    // Excluir evento
     window.excluirEvento = (id) => {
         itemParaExcluir = { tipo: 'evento', id };
         document.getElementById('excluir-mensagem').innerText = 'Tem certeza que deseja excluir este evento?';
@@ -1694,6 +3179,7 @@
             if (itemParaExcluir.tipo === 'notificacao') collectionName = 'notificacoes';
             else if (itemParaExcluir.tipo === 'evento') collectionName = 'eventos';
             else if (itemParaExcluir.tipo === 'membro') collectionName = 'membros';
+            else if (itemParaExcluir.tipo === 'mensagem') collectionName = 'mensagens';
             
             await deleteDoc(doc(db, collectionName, itemParaExcluir.id));
             mostrarConfirmacao("Sucesso", "Item excluído com sucesso!");
@@ -1708,11 +3194,79 @@
         }
     });
 
-    // Navegação entre abas
+    document.getElementById('btn-registrar-acao').addEventListener('click', () => {
+        document.querySelectorAll('.acao-option').forEach(opt => opt.classList.remove('selected'));
+        document.querySelector('[data-acao="bloquear-palavra"]').classList.add('selected');
+        acaoSelecionada = 'bloquear-palavra';
+        document.getElementById('campo-bloquear-palavra').style.display = 'block';
+        document.getElementById('campo-adicionar-admin').style.display = 'none';
+        document.getElementById('campo-bloquear-conta').style.display = 'none';
+        document.getElementById('nova-palavra').value = '';
+        document.getElementById('novo-admin-email').value = '';
+        showModal(modalRegistrarAcao);
+    });
+
+    salvarAcao.addEventListener('click', async () => {
+        if (acaoSelecionada === 'bloquear-palavra') {
+            const palavra = document.getElementById('nova-palavra').value.trim().toLowerCase();
+            if (!palavra) {
+                mostrarConfirmacao("Campo vazio", "Digite a palavra a ser bloqueada.");
+                return;
+            }
+            
+            if (PALAVRAS_BLOQUEADAS.includes(palavra)) {
+                mostrarConfirmacao("Palavra já bloqueada", "Esta palavra já está na lista de bloqueio.");
+                return;
+            }
+            
+            try {
+                await addDoc(collection(db, "configuracoes", "chat", "palavrasBloqueadas"), {
+                    palavra,
+                    criadoPor: auth.currentUser?.email,
+                    data: Timestamp.now()
+                });
+                
+                PALAVRAS_BLOQUEADAS.push(palavra);
+                atualizarListaPalavrasBloqueadas();
+                mostrarConfirmacao("Sucesso", "Palavra bloqueada com sucesso!");
+                hideModal(modalRegistrarAcao);
+            } catch (e) {
+                console.error(e);
+                mostrarConfirmacao("Erro", "Falha ao bloquear palavra.");
+            }
+        } else if (acaoSelecionada === 'adicionar-admin') {
+            const email = document.getElementById('novo-admin-email').value.trim();
+            if (!email) {
+                mostrarConfirmacao("Campo vazio", "Digite o email do novo administrador.");
+                return;
+            }
+            
+            if (ADMIN_EMAILS.includes(email)) {
+                mostrarConfirmacao("Email já admin", "Este email já é administrador.");
+                return;
+            }
+            
+            try {
+                ADMIN_EMAILS.push(email);
+                await setDoc(doc(db, "configuracoes", "admins"), { emails: ADMIN_EMAILS });
+                atualizarListaAdmins();
+                mostrarConfirmacao("Sucesso", "Administrador adicionado!");
+                hideModal(modalRegistrarAcao);
+            } catch (e) {
+                console.error(e);
+                mostrarConfirmacao("Erro", "Falha ao adicionar admin.");
+            }
+        } else if (acaoSelecionada === 'bloquear-conta') {
+            hideModal(modalRegistrarAcao);
+        }
+    });
+
     const tabs = {
         'nav-inicio': 'inicio',
         'nav-agenda': 'agenda',
         'nav-gestao': 'gestao',
+        'nav-chat': 'chat',
+        'nav-acesso': 'acesso',
         'nav-plus': 'admin'
     };
 
@@ -1728,9 +3282,22 @@
                 if (tabId === 'admin' && isAdmin(auth.currentUser)) {
                     carregarNotificacoesAdmin();
                 }
+                
+                mensagemParaResponder = null;
+                chatInput.placeholder = 'Digite sua mensagem...';
             });
         }
     }
+
+    window.iniciarDrag = iniciarDrag;
+    window.finalizarDrag = finalizarDrag;
+    window.permitirDrop = permitirDrop;
+    window.sairDrop = sairDrop;
+    window.realizarDrop = realizarDrop;
+    window.removerPalavraBloqueada = window.removerPalavraBloqueada;
+    window.removerAdmin = window.removerAdmin;
+    window.desbloquearConta = window.desbloquearConta;
+    window.bloquearUsuario = window.bloquearUsuario;
 </script>
 </body>
 </html>

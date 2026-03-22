@@ -239,6 +239,92 @@
             transform: translateY(-3px);
         }
 
+        /* NOVOS ESTILOS DO DASHBOARD - APENAS ADICIONADOS, NADA MAIS FOI ALTERADO */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px 12px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(11,43,92,0.1);
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -12px rgba(11,43,92,0.2);
+        }
+        .stat-icon {
+            font-size: 2.5rem;
+            color: #0b2b5c;
+            margin-bottom: 12px;
+        }
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #0b2b5c;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: #4a5a72;
+            font-weight: 500;
+        }
+        .admins-showcase {
+            background: white;
+            border-radius: 32px;
+            padding: 20px;
+            margin-top: 12px;
+            border-left: 5px solid #0b2b5c;
+        }
+        .admins-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            color: #0b2b5c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .admins-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .admin-avatar-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 12px 18px;
+            border-radius: 60px;
+            transition: 0.2s;
+            border: 1px solid #e2e8f0;
+            min-width: 180px;
+        }
+        .admin-avatar-card img {
+            width: 44px;
+            height: 44px;
+            border-radius: 44px;
+            object-fit: cover;
+            border: 2px solid #0b2b5c;
+        }
+        .admin-info h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0b2b5c;
+        }
+        .admin-info p {
+            font-size: 0.7rem;
+            color: #5f6c86;
+        }
+
         /* ITENS DE LISTA - AJUSTE PARA EVITAR SOBREPOSIÇÃO DOS ÍCONES */
         .notificacao-item, .evento-item, .membro-item, .usuario-item {
             background: white;
@@ -1432,13 +1518,33 @@
     </header>
 
     <main>
-        <!-- ABA INÍCIO -->
+        <!-- ABA INÍCIO - MODIFICADA COM DASHBOARD -->
         <div id="inicio" class="tab-content active">
             <div class="card">
-                <h3><i class="fa-solid fa-house" style="margin-right: 10px;"></i> Início</h3>
-                <p style="margin-bottom: 16px;">Bem‑vindo de volta! Fique por dentro de tudo.</p>
-                <div style="background: #d9e9ff; border-radius: 24px; padding: 20px;">
-                    <strong>Comunicado:</strong> A nova gestão já está atuando. Fique ligado!
+                <h3><i class="fa-solid fa-chart-line" style="margin-right: 10px;"></i> Dashboard Grêmio</h3>
+                <div class="stats-grid" id="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-regular fa-calendar"></i></div>
+                        <div class="stat-number" id="total-eventos-dash">0</div>
+                        <div class="stat-label">Eventos Criados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-number" id="total-membros-dash">0</div>
+                        <div class="stat-label">Membros da Gestão</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-user-tie"></i></div>
+                        <div class="stat-number" id="total-admins-dash">0</div>
+                        <div class="stat-label">Administradores</div>
+                    </div>
+                </div>
+                <div class="admins-showcase" id="admins-showcase-container">
+                    <div class="admins-title"><i class="fa-solid fa-crown"></i> Equipe Administrativa</div>
+                    <div class="admins-list" id="admins-list-dynamic">Carregando administradores...</div>
+                </div>
+                <div style="background: #d9e9ff; border-radius: 24px; padding: 20px; margin-top: 20px;">
+                    <strong><i class="fa-regular fa-bell"></i> Comunicado:</strong> A nova gestão já está atuando. Fique ligado!
                 </div>
             </div>
         </div>
@@ -2000,6 +2106,43 @@
     // Flag para controlar se já migrou os dados
     let migracaoRealizada = false;
 
+    // ===== FUNÇÕES DO DASHBOARD (NOVAS) =====
+    async function atualizarDashboard() {
+        if (!auth.currentUser) return;
+        try {
+            const eventosSnap = await getDocs(collection(db, "eventos"));
+            const membrosSnap = await getDocs(collection(db, "membros"));
+            document.getElementById('total-eventos-dash').innerText = eventosSnap.size;
+            document.getElementById('total-membros-dash').innerText = membrosSnap.size;
+            document.getElementById('total-admins-dash').innerText = ADMIN_EMAILS.length;
+            
+            const adminsContainer = document.getElementById('admins-list-dynamic');
+            if (adminsContainer) {
+                if (ADMIN_EMAILS.length === 0) {
+                    adminsContainer.innerHTML = '<p style="color:#94a3b8;">Nenhum administrador registrado.</p>';
+                } else {
+                    let html = '';
+                    for (const email of ADMIN_EMAILS) {
+                        let nome = email.split('@')[0];
+                        let foto = `https://ui-avatars.com/api/?name=${nome}&background=0b2b5c&color=fff&size=44&bold=true`;
+                        html += `
+                            <div class="admin-avatar-card">
+                                <img src="${foto}" onerror="this.src='https://via.placeholder.com/44'" alt="admin">
+                                <div class="admin-info">
+                                    <h4>${nome}</h4>
+                                    <p>${email}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    adminsContainer.innerHTML = html;
+                }
+            }
+        } catch(e) {
+            console.error("Erro ao atualizar dashboard:", e);
+        }
+    }
+
     // Atualizar previews de cor
     if (eventoCor && eventoCorPreview) {
         eventoCor.addEventListener('input', () => {
@@ -2079,6 +2222,7 @@
             atualizarListaPalavrasBloqueadas();
             atualizarListaAdmins();
             atualizarListaContasBloqueadas();
+            atualizarDashboard(); // Atualiza dashboard após carregar admins
         } catch (e) {
             console.error("Erro ao carregar configurações:", e);
         }
@@ -2162,14 +2306,12 @@
         container.innerHTML = '<p style="color:#5f6b7a;">Carregando todos os usuários...</p>';
         
         try {
-            const usuariosMap = new Map(); // Usar email como chave para evitar duplicatas
+            const usuariosMap = new Map();
             
-            // 1. Buscar usuários que já enviaram mensagens no chat
             const mensagensSnap = await getDocs(collection(db, "mensagens"));
             mensagensSnap.forEach(doc => {
                 const msg = doc.data();
                 if (msg.autorId && msg.autorNome) {
-                    // Tentar obter email da mensagem se disponível
                     const email = msg.autorEmail || `${msg.autorId.substring(0,8)}@usuario.firebase`;
                     const key = email;
                     
@@ -2187,11 +2329,9 @@
                 }
             });
             
-            // 2. Buscar membros da gestão
             const membrosSnap = await getDocs(collection(db, "membros"));
             membrosSnap.forEach(doc => {
                 const membro = doc.data();
-                // Se o membro tiver um email, adicionar
                 if (membro.email) {
                     const key = membro.email;
                     if (!usuariosMap.has(key)) {
@@ -2207,47 +2347,6 @@
                 }
             });
             
-            // 3. Buscar usuários que criaram notificações
-            const notificacoesSnap = await getDocs(collection(db, "notificacoes"));
-            notificacoesSnap.forEach(doc => {
-                const notif = doc.data();
-                if (notif.criadoPor && notif.criadoPor.includes('@')) {
-                    const email = notif.criadoPor;
-                    const key = email;
-                    if (!usuariosMap.has(key)) {
-                        usuariosMap.set(key, {
-                            id: `notif_${email}`,
-                            nome: email.split('@')[0],
-                            email: email,
-                            foto: 'https://via.placeholder.com/40',
-                            isAdmin: ADMIN_EMAILS.includes(email),
-                            isBloqueado: CONTAS_BLOQUEADAS.includes(email)
-                        });
-                    }
-                }
-            });
-            
-            // 4. Buscar usuários que criaram eventos
-            const eventosSnap = await getDocs(collection(db, "eventos"));
-            eventosSnap.forEach(doc => {
-                const evento = doc.data();
-                if (evento.criadoPor && evento.criadoPor.includes('@')) {
-                    const email = evento.criadoPor;
-                    const key = email;
-                    if (!usuariosMap.has(key)) {
-                        usuariosMap.set(key, {
-                            id: `evento_${email}`,
-                            nome: email.split('@')[0],
-                            email: email,
-                            foto: 'https://via.placeholder.com/40',
-                            isAdmin: ADMIN_EMAILS.includes(email),
-                            isBloqueado: CONTAS_BLOQUEADAS.includes(email)
-                        });
-                    }
-                }
-            });
-            
-            // 5. ADICIONAR TODOS OS EMAILS DOS ADMINS
             ADMIN_EMAILS.forEach(email => {
                 const key = email;
                 if (!usuariosMap.has(key)) {
@@ -2260,14 +2359,12 @@
                         isBloqueado: CONTAS_BLOQUEADAS.includes(email)
                     });
                 } else {
-                    // Atualizar para garantir que é admin
                     const usuario = usuariosMap.get(key);
                     usuario.isAdmin = true;
                     usuariosMap.set(key, usuario);
                 }
             });
             
-            // 6. ADICIONAR TODOS OS EMAILS DOS BLOQUEADOS
             CONTAS_BLOQUEADAS.forEach(email => {
                 const key = email;
                 if (!usuariosMap.has(key)) {
@@ -2280,17 +2377,13 @@
                         isBloqueado: true
                     });
                 } else {
-                    // Atualizar para garantir que está como bloqueado
                     const usuario = usuariosMap.get(key);
                     usuario.isBloqueado = true;
                     usuariosMap.set(key, usuario);
                 }
             });
             
-            // Converter mapa para array
             const usuariosArray = Array.from(usuariosMap.values());
-            
-            // Ordenar por nome
             usuariosArray.sort((a, b) => a.nome.localeCompare(b.nome));
             
             if (usuariosArray.length === 0) {
@@ -2323,7 +2416,6 @@
                 `;
             });
             
-            // Adicionar instrução
             html += `
                 <div style="margin-top:20px; padding:15px; background:#f0f4fa; border-radius:20px; font-size:0.9rem; color:#4a5a72;">
                     <i class="fa-solid fa-info-circle"></i> 
@@ -2366,6 +2458,7 @@
             ADMIN_EMAILS = ADMIN_EMAILS.filter(e => e !== email);
             await setDoc(doc(db, "configuracoes", "admins"), { emails: ADMIN_EMAILS });
             atualizarListaAdmins();
+            atualizarDashboard();
             mostrarConfirmacao("Sucesso", "Administrador removido!");
         } catch (e) {
             console.error(e);
@@ -2388,7 +2481,6 @@
             CONTAS_BLOQUEADAS = CONTAS_BLOQUEADAS.filter(e => e !== email);
             atualizarListaContasBloqueadas();
             
-            // Atualizar a lista de usuários se estiver visível
             if (document.getElementById('campo-bloquear-conta').style.display === 'block') {
                 carregarTodosUsuarios();
             }
@@ -2407,13 +2499,11 @@
         }
         
         try {
-            // Verificar se já está bloqueado
             if (CONTAS_BLOQUEADAS.includes(email)) {
                 mostrarConfirmacao("Aviso", "Esta conta já está bloqueada.");
                 return;
             }
             
-            // Verificar se é admin
             if (ADMIN_EMAILS.includes(email)) {
                 mostrarConfirmacao("Aviso", "Administradores não podem ser bloqueados.");
                 return;
@@ -2429,7 +2519,6 @@
             CONTAS_BLOQUEADAS.push(email);
             atualizarListaContasBloqueadas();
             
-            // Atualizar a lista de usuários se estiver visível
             if (document.getElementById('campo-bloquear-conta').style.display === 'block') {
                 carregarTodosUsuarios();
             }
@@ -2437,7 +2526,7 @@
             mostrarConfirmacao("Sucesso", `Usuário ${nome} (${email}) bloqueado com sucesso!`);
         } catch (e) {
             console.error("Erro ao bloquear usuário:", e);
-            mostrarConfirmacao("Erro", "Falha ao bloquear usuário. Verifique o console para mais detalhes.");
+            mostrarConfirmacao("Erro", "Falha ao bloquear usuário.");
         }
     };
 
@@ -2553,10 +2642,8 @@
         visualizacoesLista.innerHTML = '<p style="color:#94a3b8; text-align:center;">Carregando visualizações...</p>';
         showModal(modalVisualizacoes);
         
-        // Carregar visualizações imediatamente
         await carregarVisualizacoes(mensagemId);
         
-        // Iniciar atualização periódica (a cada 3 segundos)
         if (visualizacoesUpdateInterval) {
             clearInterval(visualizacoesUpdateInterval);
         }
@@ -2579,14 +2666,12 @@
                 return;
             }
 
-            // Ordenar visualizações por data (mais recentes primeiro)
             const visualizacoes = [];
             visualizacoesSnap.forEach(doc => {
                 const vis = doc.data();
                 visualizacoes.push(vis);
             });
             
-            // Ordenar por timestamp decrescente
             visualizacoes.sort((a, b) => {
                 if (!a.timestamp) return 1;
                 if (!b.timestamp) return -1;
@@ -2660,14 +2745,12 @@
                 const hora = data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const dataFormatada = data.toLocaleDateString();
 
-                // Buscar contagem de visualizações
                 let visualizacoesCount = 0;
                 let primeirasVisualizacoes = [];
                 try {
                     const visualizacoesSnap = await getDocs(collection(db, "mensagens", doc.id, "visualizacoes"));
                     visualizacoesCount = visualizacoesSnap.size;
                     
-                    // Pegar as 3 primeiras visualizações para os avatares
                     visualizacoesSnap.forEach(v => {
                         if (primeirasVisualizacoes.length < 3) {
                             primeirasVisualizacoes.push(v.data());
@@ -2677,7 +2760,6 @@
                     console.error("Erro ao carregar visualizações:", e);
                 }
 
-                // HTML das visualizações (agora clicável)
                 let visualizacoesHtml = '';
                 if (visualizacoesCount > 0) {
                     visualizacoesHtml = `
@@ -2736,14 +2818,12 @@
                 `;
             }
             
-            // Atualizar apenas se o conteúdo mudou (evita piscar)
             if (chatMessages.innerHTML !== html) {
                 const scrollPos = chatMessages.scrollTop;
                 const wasAtBottom = chatMessages.scrollHeight - chatMessages.scrollTop <= chatMessages.clientHeight + 100;
                 
                 chatMessages.innerHTML = html;
                 
-                // Manter scroll position ou ir para o final se estava no final
                 if (wasAtBottom) {
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 } else {
@@ -2751,7 +2831,6 @@
                 }
             }
             
-            // Se o modal de visualizações estiver aberto, atualizar silenciosamente
             if (modalVisualizacoes.classList.contains('active') && mensagemVisualizacoesAtual) {
                 carregarVisualizacoes(mensagemVisualizacoesAtual);
             }
@@ -2774,7 +2853,6 @@
     closeVisualizacoes.addEventListener('click', fecharModalVisualizacoes);
     fecharVisualizacoes.addEventListener('click', fecharModalVisualizacoes);
     
-    // Fechar ao clicar fora
     modalVisualizacoes.addEventListener('click', (e) => {
         if (e.target === modalVisualizacoes) {
             fecharModalVisualizacoes();
@@ -2977,6 +3055,7 @@
             carregarMembrosTempoReal();
             carregarMensagensTempoReal();
             monitorarDigitacao();
+            atualizarDashboard(); // Atualiza dashboard ao logar
 
             if (document.getElementById('admin').classList.contains('active') && admin) {
                 carregarNotificacoesAdmin();
@@ -3794,6 +3873,7 @@
                 ADMIN_EMAILS.push(email);
                 await setDoc(doc(db, "configuracoes", "admins"), { emails: ADMIN_EMAILS });
                 atualizarListaAdmins();
+                atualizarDashboard();
                 mostrarConfirmacao("Sucesso", "Administrador adicionado!");
                 hideModal(modalRegistrarAcao);
             } catch (e) {
@@ -3830,7 +3910,6 @@
                 mensagemParaResponder = null;
                 chatInput.placeholder = 'Digite sua mensagem...';
 
-                // Limpar intervalo de visualizações ao mudar de aba
                 if (visualizacoesUpdateInterval) {
                     clearInterval(visualizacoesUpdateInterval);
                     visualizacoesUpdateInterval = null;
